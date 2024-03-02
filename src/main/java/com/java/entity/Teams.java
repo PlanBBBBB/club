@@ -39,4 +39,8 @@ public class Teams implements Serializable {
     @TableField(value = "type_id")
     @ApiModelProperty(value = "社团编号")
     private String typeId;
+
+    @TableField(value = "picture_url")
+    @ApiModelProperty(value = "社团图片")
+    private String pictureUrl;
 }
