@@ -9,9 +9,10 @@ import com.java.utils.DateUtils;
 import com.java.utils.IDUtils;
 import com.java.vo.PageData;
 import com.java.vo.R;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,6 +27,7 @@ import javax.annotation.Resource;
  */
 @Controller
 @RequestMapping("/applyLogs")
+@Api(tags = "申请记录")
 public class ApplyLogsController extends BaseController {
 
     protected static final Logger Log = LoggerFactory.getLogger(ApplyLogsController.class);
@@ -39,14 +41,16 @@ public class ApplyLogsController extends BaseController {
     @Resource
     private ApplyLogsService applyLogsService;
 
-    @RequestMapping("")
+    @PostMapping("")
+    @ApiOperation("跳转到申请记录页面")
     public String index() {
 
         return "pages/ApplyLogs";
     }
 
-    @GetMapping("/info")
+    @PostMapping("/info")
     @ResponseBody
+    @ApiOperation("获取申请记录信息")
     public R getInfo(String id) {
 
         Log.info("查找指定申请记录，ID：{}", id);
@@ -56,8 +60,9 @@ public class ApplyLogsController extends BaseController {
         return R.successData(applyLogs);
     }
 
-    @GetMapping("/page")
+    @PostMapping("/page")
     @ResponseBody
+    @ApiOperation("分页获取申请记录信息")
     public R getPageInfos(Long pageIndex, Long pageSize,
                           String token, String teamName, String userName) {
 
@@ -97,6 +102,7 @@ public class ApplyLogsController extends BaseController {
 
     @PostMapping("/add")
     @ResponseBody
+    @ApiOperation("添加申请记录")
     public R addInfo(String token, ApplyLogs applyLogs) {
 
         Users user = usersService.getOne(cacheHandle.getUserInfoCache(token));
@@ -120,6 +126,7 @@ public class ApplyLogsController extends BaseController {
 
     @PostMapping("/upd")
     @ResponseBody
+    @ApiOperation("修改申请记录")
     public R updInfo(ApplyLogs applyLogs) {
 
         Log.info("修改申请记录，传入参数：{}", applyLogs);
@@ -131,6 +138,7 @@ public class ApplyLogsController extends BaseController {
 
     @PostMapping("/del")
     @ResponseBody
+    @ApiOperation("删除申请记录")
     public R delInfo(String id) {
 
         Log.info("删除申请记录, ID:{}", id);

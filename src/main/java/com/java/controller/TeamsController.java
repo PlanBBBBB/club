@@ -9,6 +9,8 @@ import com.java.utils.DateUtils;
 import com.java.utils.IDUtils;
 import com.java.vo.PageData;
 import com.java.vo.R;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,7 @@ import java.util.List;
  */
 @Controller
 @RequestMapping("/teams")
+@Api(tags = "社团信息")
 public class TeamsController extends BaseController {
 
     protected static final Logger Log = LoggerFactory.getLogger(TeamsController.class);
@@ -40,14 +43,16 @@ public class TeamsController extends BaseController {
     @Resource
     private TeamsService teamsService;
 
-    @RequestMapping("")
+    @PostMapping("")
+    @ApiOperation("跳转到社团信息页面")
     public String index() {
 
         return "pages/Teams";
     }
 
-    @GetMapping("/info")
+    @PostMapping("/info")
     @ResponseBody
+    @ApiOperation("查找指定社团信息")
     public R getInfo(String id) {
 
         Log.info("查找指定社团信息，ID：{}", id);
@@ -57,8 +62,9 @@ public class TeamsController extends BaseController {
         return R.successData(teams);
     }
 
-    @GetMapping("/all")
+    @PostMapping("/all")
     @ResponseBody
+    @ApiOperation("获取全部的社团")
     public R getAll(){
 
         Log.info("获取全部的社团");
@@ -68,8 +74,9 @@ public class TeamsController extends BaseController {
         return R.successData(list);
     }
 
-    @GetMapping("/man")
+    @PostMapping("/man")
     @ResponseBody
+    @ApiOperation("获取指定社团管理员相关的社团列表")
     public R getListByManId(String manId){
 
         Log.info("获取指定社团管理员相关的社团列表");
@@ -79,8 +86,9 @@ public class TeamsController extends BaseController {
         return R.successData(list);
     }
 
-    @GetMapping("/page")
+    @PostMapping("/page")
     @ResponseBody
+    @ApiOperation("分页获取社团信息")
     public R getPageInfos(Long pageIndex, Long pageSize,
                          String token, Teams teams) {
 
@@ -102,6 +110,7 @@ public class TeamsController extends BaseController {
 
     @PostMapping("/add")
     @ResponseBody
+    @ApiOperation("添加社团信息")
     public R addInfo(Teams teams) {
 
         teams.setId(IDUtils.makeIDByCurrent());
@@ -116,6 +125,7 @@ public class TeamsController extends BaseController {
 
     @PostMapping("/upd")
     @ResponseBody
+    @ApiOperation("修改社团信息")
     public R updInfo(Teams teams) {
 
         Log.info("修改社团信息，传入参数：{}", teams);
@@ -127,6 +137,7 @@ public class TeamsController extends BaseController {
 
     @PostMapping("/del")
     @ResponseBody
+    @ApiOperation("删除社团信息")
     public R delInfo(String id) {
 
         Log.info("删除社团信息, ID:{}", id);

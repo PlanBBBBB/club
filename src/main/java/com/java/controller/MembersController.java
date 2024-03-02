@@ -8,6 +8,8 @@ import com.java.service.UsersService;
 import com.java.utils.IDUtils;
 import com.java.vo.PageData;
 import com.java.vo.R;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -24,6 +26,7 @@ import javax.annotation.Resource;
  */
 @Controller
 @RequestMapping("/members")
+@Api(tags = "成员信息")
 public class
 MembersController extends BaseController {
 
@@ -38,14 +41,16 @@ MembersController extends BaseController {
     @Resource
     private MembersService membersService;
 
-    @RequestMapping("")
+    @PostMapping("")
+    @ApiOperation("跳转至成员信息页面")
     public String index() {
 
         return "pages/Members";
     }
 
-    @GetMapping("/info")
+    @PostMapping("/info")
     @ResponseBody
+    @ApiOperation("查找指定成员信息")
     public R getInfo(String id) {
 
         Log.info("查找指定成员信息，ID：{}", id);
@@ -55,8 +60,9 @@ MembersController extends BaseController {
         return R.successData(members);
     }
 
-    @GetMapping("/page")
+    @PostMapping("/page")
     @ResponseBody
+    @ApiOperation("分页查找成员信息")
     public R getPageInfos(Long pageIndex, Long pageSize,
                           String token, String teamName, String userName) {
 
@@ -86,6 +92,7 @@ MembersController extends BaseController {
 
     @PostMapping("/add")
     @ResponseBody
+    @ApiOperation("添加成员信息")
     public R addInfo(Members members) {
 
         members.setId(IDUtils.makeIDByCurrent());
@@ -99,6 +106,7 @@ MembersController extends BaseController {
 
     @PostMapping("/upd")
     @ResponseBody
+    @ApiOperation("修改成员信息")
     public R updInfo(Members members) {
 
         Log.info("修改成员信息，传入参数：{}", members);
@@ -110,6 +118,7 @@ MembersController extends BaseController {
 
     @PostMapping("/del")
     @ResponseBody
+    @ApiOperation("删除成员信息")
     public R delInfo(String id) {
 
         Members members = membersService.getOne(id);

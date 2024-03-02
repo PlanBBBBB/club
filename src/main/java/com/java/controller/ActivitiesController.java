@@ -8,9 +8,10 @@ import com.java.service.UsersService;
 import com.java.utils.IDUtils;
 import com.java.vo.PageData;
 import com.java.vo.R;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,6 +26,7 @@ import javax.annotation.Resource;
  */
 @Controller
 @RequestMapping("/activities")
+@Api(tags = "活动信息")
 public class ActivitiesController extends BaseController {
 
     protected static final Logger Log = LoggerFactory.getLogger(ActivitiesController.class);
@@ -39,14 +41,16 @@ public class ActivitiesController extends BaseController {
     @Resource
     private ActivitiesService activitiesService;
 
-    @RequestMapping("")
+    @PostMapping("")
+    @ApiOperation("活动信息首页")
     public String index() {
 
         return "pages/Activities";
     }
 
-    @GetMapping("/info")
+    @PostMapping("/info")
     @ResponseBody
+    @ApiOperation("查找指定活动信息")
     public R getInfo(String id) {
 
         Log.info("查找指定活动信息，ID：{}", id);
@@ -56,8 +60,9 @@ public class ActivitiesController extends BaseController {
         return R.successData(activities);
     }
 
-    @GetMapping("/page")
+    @PostMapping("/page")
     @ResponseBody
+    @ApiOperation("分页查找活动信息")
     public R getPageInfos(Long pageIndex, Long pageSize,
                           String token, String teamName, String activeName) {
 
@@ -86,6 +91,7 @@ public class ActivitiesController extends BaseController {
 
     @PostMapping("/add")
     @ResponseBody
+    @ApiOperation("添加活动信息")
     public R addInfo(Activities activities) {
 
         activities.setId(IDUtils.makeIDByCurrent());
@@ -99,6 +105,7 @@ public class ActivitiesController extends BaseController {
 
     @PostMapping("/upd")
     @ResponseBody
+    @ApiOperation("修改活动信息")
     public R updInfo(Activities activities) {
 
         Log.info("修改活动信息，传入参数：{}", activities);
@@ -110,6 +117,7 @@ public class ActivitiesController extends BaseController {
 
     @PostMapping("/del")
     @ResponseBody
+    @ApiOperation("删除活动信息")
     public R delInfo(String id) {
 
         Log.info("删除活动信息, ID:{}", id);

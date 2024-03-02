@@ -6,6 +6,8 @@ import com.java.utils.DateUtils;
 import com.java.utils.IDUtils;
 import com.java.vo.PageData;
 import com.java.vo.R;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,7 @@ import java.util.List;
  */
 @Controller
 @RequestMapping("/teamTypes")
+@Api(tags = "社团类型管理")
 public class TeamTypesController extends BaseController {
 
     protected static final Logger Log = LoggerFactory.getLogger(TeamTypesController.class);
@@ -30,14 +33,16 @@ public class TeamTypesController extends BaseController {
     @Autowired
     private TeamTypesService teamTypesService;
 
-    @RequestMapping("")
+    @PostMapping("")
+    @ApiOperation("社团类型页面")
     public String index() {
 
         return "pages/TeamTypes";
     }
 
-    @GetMapping("/all")
+    @PostMapping("/all")
     @ResponseBody
+    @ApiOperation("查看全部的社团类型信息")
     public R getAll(){
 
         Log.info("查看全部的社团类型信息");
@@ -47,8 +52,9 @@ public class TeamTypesController extends BaseController {
         return R.successData(list);
     }
 
-    @GetMapping("/info")
+    @PostMapping("/info")
     @ResponseBody
+    @ApiOperation("查找指定社团类型")
     public R getInfo(String id) {
 
         Log.info("查找指定社团类型，ID：{}", id);
@@ -58,8 +64,9 @@ public class TeamTypesController extends BaseController {
         return R.successData(teamTypes);
     }
 
-    @GetMapping("/page")
+    @PostMapping("/page")
     @ResponseBody
+    @ApiOperation("分页查找社团类型")
     public R getPageInfos(Long pageIndex, Long pageSize,
                           TeamTypes teamTypes) {
 
@@ -74,6 +81,7 @@ public class TeamTypesController extends BaseController {
 
     @PostMapping("/add")
     @ResponseBody
+    @ApiOperation("添加社团类型")
     public R addInfo(TeamTypes teamTypes) {
 
         teamTypes.setId(IDUtils.makeIDByCurrent());
@@ -88,6 +96,7 @@ public class TeamTypesController extends BaseController {
 
     @PostMapping("/upd")
     @ResponseBody
+    @ApiOperation("修改社团类型")
     public R updInfo(TeamTypes teamTypes) {
 
         Log.info("修改社团类型，传入参数：{}", teamTypes);
@@ -99,6 +108,7 @@ public class TeamTypesController extends BaseController {
 
     @PostMapping("/del")
     @ResponseBody
+    @ApiOperation("删除社团类型")
     public R delInfo(String id) {
 
         if(teamTypesService.isRemove(id)){

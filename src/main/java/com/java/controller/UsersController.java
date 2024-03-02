@@ -6,6 +6,8 @@ import com.java.utils.DateUtils;
 import com.java.utils.IDUtils;
 import com.java.vo.PageData;
 import com.java.vo.R;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,7 @@ import javax.annotation.Resource;
  */
 @Controller
 @RequestMapping("/users")
+@Api(tags = "系统用户")
 public class UsersController extends BaseController {
 
     protected static final Logger Log = LoggerFactory.getLogger(UsersController.class);
@@ -30,14 +33,16 @@ public class UsersController extends BaseController {
     @Resource
     private UsersService usersService;
 
-    @RequestMapping("")
+    @PostMapping("")
+    @ApiOperation("系统用户首页")
     public String index() {
 
         return "pages/Users";
     }
 
-    @GetMapping("/info")
+    @PostMapping("/info")
     @ResponseBody
+    @ApiOperation("查找指定系统用户")
     public R getInfo(String id) {
 
         Log.info("查找指定系统用户，ID：{}", id);
@@ -47,8 +52,9 @@ public class UsersController extends BaseController {
         return R.successData(users);
     }
 
-    @GetMapping("/page")
+    @PostMapping("/page")
     @ResponseBody
+    @ApiOperation("分页查找系统用户")
     public R getPageInfos(Long pageIndex, Long pageSize,
                           Users users) {
 
@@ -63,6 +69,7 @@ public class UsersController extends BaseController {
 
     @PostMapping("/add")
     @ResponseBody
+    @ApiOperation("添加系统用户")
     public R addInfo(Users users) {
 
         if(usersService.getUserByUserName(users.getUserName()) == null){
@@ -83,6 +90,7 @@ public class UsersController extends BaseController {
 
     @PostMapping("/upd")
     @ResponseBody
+    @ApiOperation("修改系统用户")
     public R updInfo(Users users) {
 
         Log.info("修改系统用户，传入参数：{}", users);
@@ -94,6 +102,7 @@ public class UsersController extends BaseController {
 
     @PostMapping("/del")
     @ResponseBody
+    @ApiOperation("删除系统用户")
     public R delInfo(String id) {
 
         if(usersService.isRemove(id)){

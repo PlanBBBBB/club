@@ -7,6 +7,8 @@ import com.java.service.NoticesService;
 import com.java.service.UsersService;
 import com.java.utils.IDUtils;
 import com.java.vo.R;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,7 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/")
+@Api(tags = "首页")
 public class IndexController extends BaseController {
 
     private static final Logger Log = LoggerFactory.getLogger(IndexController.class);
@@ -35,8 +38,9 @@ public class IndexController extends BaseController {
     @Resource
     private NoticesService noticesService;
 
-    @GetMapping("/sys/notices")
+    @PostMapping("/sys/notices")
     @ResponseBody
+    @ApiOperation("获取系统通知")
     public R getNoticeList(String token){
 
         Users user = usersService.getOne(cacheHandle.getUserInfoCache(token));
@@ -61,6 +65,7 @@ public class IndexController extends BaseController {
 
     @PostMapping("/login")
     @ResponseBody
+    @ApiOperation("用户登录")
     public R login(String userName, String passWord, HttpSession session){
 
         Log.info("用户登录，用户名：{}， 用户密码：{}", userName, passWord);
@@ -86,8 +91,9 @@ public class IndexController extends BaseController {
         }
     }
 
-    @RequestMapping("/exit")
+    @PostMapping("/exit")
     @ResponseBody
+    @ApiOperation("用户退出")
     public R exit(String token) {
 
         Log.info("用户退出系统并移除登录信息");
@@ -97,8 +103,9 @@ public class IndexController extends BaseController {
         return R.success();
     }
 
-    @GetMapping("/info")
+    @PostMapping("/getInfo")
     @ResponseBody
+    @ApiOperation("获取用户信息")
     public R info(String token){
 
         Users user = usersService.getOne(cacheHandle.getUserInfoCache(token));
@@ -106,8 +113,9 @@ public class IndexController extends BaseController {
         return R.successData(user);
     }
 
-    @PostMapping("/info")
+    @PostMapping("/changeInfo")
     @ResponseBody
+    @ApiOperation("修改用户信息")
     public R info(Users user){
 
         Log.info("修改用户信息，{}", user);
@@ -117,8 +125,9 @@ public class IndexController extends BaseController {
         return R.success();
     }
 
-    @RequestMapping("/checkPwd")
+    @PostMapping("/checkPwd")
     @ResponseBody
+    @ApiOperation("验证原始密码")
     public R checkPwd(String oldPwd, String token) {
 
         Users user = usersService.getOne(cacheHandle.getUserInfoCache(token));
@@ -134,6 +143,7 @@ public class IndexController extends BaseController {
 
     @PostMapping("/pwd")
     @ResponseBody
+    @ApiOperation("修改用户密码")
     public R pwd(String token, String password) {
 
         Log.info("修改用户密码，{}", password);

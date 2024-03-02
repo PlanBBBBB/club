@@ -8,6 +8,8 @@ import com.java.service.UsersService;
 import com.java.utils.DateUtils;
 import com.java.utils.IDUtils;
 import com.java.vo.R;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -26,6 +28,7 @@ import java.util.Map;
  */
 @Controller
 @RequestMapping("/activeLogs")
+@Api(tags = "报名记录")
 public class ActiveLogsController extends BaseController {
 
     protected static final Logger Log = LoggerFactory.getLogger(ActiveLogsController.class);
@@ -39,14 +42,16 @@ public class ActiveLogsController extends BaseController {
     @Resource
     private ActiveLogsService activeLogsService;
 
-    @RequestMapping("")
+    @PostMapping("")
+    @ApiOperation(value = "报名记录页面")
     public String index() {
 
         return "pages/ActiveLogs";
     }
 
-    @GetMapping("/info")
+    @PostMapping("/info")
     @ResponseBody
+    @ApiOperation(value = "获取指定报名记录")
     public R getInfo(String id) {
 
         Log.info("查找指定报名记录，ID：{}", id);
@@ -56,8 +61,9 @@ public class ActiveLogsController extends BaseController {
         return R.successData(activeLogs);
     }
 
-    @GetMapping("/list")
+    @PostMapping("/list")
     @ResponseBody
+    @ApiOperation(value = "获取指定活动的报名记录")
     public R getList(String activeId) {
 
         Log.info("获取指定活动的报名记录，活动ID：{}", activeId);
@@ -69,6 +75,7 @@ public class ActiveLogsController extends BaseController {
 
     @PostMapping("/add")
     @ResponseBody
+    @ApiOperation(value = "添加报名记录")
     public R addInfo(String token, ActiveLogs activeLogs) {
 
         Users user = usersService.getOne(cacheHandle.getUserInfoCache(token));
@@ -92,6 +99,7 @@ public class ActiveLogsController extends BaseController {
 
     @PostMapping("/upd")
     @ResponseBody
+    @ApiOperation(value = "修改报名记录")
     public R updInfo(ActiveLogs activeLogs) {
 
         Log.info("修改报名记录，传入参数：{}", activeLogs);
@@ -103,6 +111,7 @@ public class ActiveLogsController extends BaseController {
 
     @PostMapping("/del")
     @ResponseBody
+    @ApiOperation(value = "删除报名记录")
     public R delInfo(String id) {
 
         Log.info("删除报名记录, ID:{}", id);

@@ -10,6 +10,8 @@ import com.java.utils.IDUtils;
 import com.java.utils.StringUtils;
 import com.java.vo.PageData;
 import com.java.vo.R;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -26,6 +28,7 @@ import javax.annotation.Resource;
  */
 @Controller
 @RequestMapping("/notices")
+@Api(tags = "通知记录")
 public class NoticesController extends BaseController {
 
     protected static final Logger Log = LoggerFactory.getLogger(NoticesController.class);
@@ -39,14 +42,16 @@ public class NoticesController extends BaseController {
     @Resource
     private UsersService usersService;
 
-    @RequestMapping("")
+    @PostMapping("")
+    @ApiOperation("跳转到通知记录页面")
     public String index() {
 
         return "pages/Notices";
     }
 
-    @GetMapping("/info")
+    @PostMapping("/info")
     @ResponseBody
+    @ApiOperation("查找指定通知记录")
     public R getInfo(String id) {
 
         Log.info("查找指定通知记录，ID：{}", id);
@@ -56,8 +61,9 @@ public class NoticesController extends BaseController {
         return R.successData(notices);
     }
 
-    @GetMapping("/page")
+    @PostMapping("/page")
     @ResponseBody
+    @ApiOperation("分页查找通知记录")
     public R getPageInfos(Long pageIndex, Long pageSize,
                           String token, String title, String teamName) {
 
@@ -86,6 +92,7 @@ public class NoticesController extends BaseController {
 
     @PostMapping("/add")
     @ResponseBody
+    @ApiOperation("添加通知记录")
     public R addInfo(Notices notices) {
 
         notices.setId(IDUtils.makeIDByCurrent());
@@ -105,6 +112,7 @@ public class NoticesController extends BaseController {
 
     @PostMapping("/upd")
     @ResponseBody
+    @ApiOperation("修改通知记录")
     public R updInfo(Notices notices) {
 
         Log.info("修改通知记录，传入参数：{}", notices);
@@ -116,6 +124,7 @@ public class NoticesController extends BaseController {
 
     @PostMapping("/del")
     @ResponseBody
+    @ApiOperation("删除通知记录")
     public R delInfo(String id) {
 
         Log.info("删除通知记录, ID:{}", id);
