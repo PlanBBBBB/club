@@ -11,7 +11,7 @@
  Target Server Version : 80100 (8.1.0)
  File Encoding         : 65001
 
- Date: 02/03/2024 17:39:50
+ Date: 02/03/2024 20:24:33
 */
 
 SET NAMES utf8mb4;
@@ -85,6 +85,23 @@ INSERT INTO `apply_logs` VALUES ('1672148640042', 1, '2022-12-27 21:44:00', '164
 INSERT INTO `apply_logs` VALUES ('1679549203332', 1, '2023-03-23 13:26:43', '1672148926602', '1679549174356');
 
 -- ----------------------------
+-- Table structure for comments
+-- ----------------------------
+DROP TABLE IF EXISTS `comments`;
+CREATE TABLE `comments`  (
+  `id` int NOT NULL AUTO_INCREMENT COMMENT '评论ID',
+  `activities_id` char(13) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '社团活动ID',
+  `users_id` char(13) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '评论的用户ID',
+  `content` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '评论内容',
+  `created` datetime NULL DEFAULT NULL COMMENT '评论时间',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of comments
+-- ----------------------------
+
+-- ----------------------------
 -- Table structure for members
 -- ----------------------------
 DROP TABLE IF EXISTS `members`;
@@ -147,6 +164,29 @@ CREATE TABLE `pay_logs`  (
 -- Records of pay_logs
 -- ----------------------------
 INSERT INTO `pay_logs` VALUES ('1679549016873', '2023-03-23 13:23:36', 100, '1672148926602', '1672148602348');
+
+-- ----------------------------
+-- Table structure for style
+-- ----------------------------
+DROP TABLE IF EXISTS `style`;
+CREATE TABLE `style`  (
+  `id` char(13) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL COMMENT '风采ID',
+  `name` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL COMMENT '风采名称',
+  `comm` varchar(60) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL COMMENT '风采概述',
+  `detail` varchar(256) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL COMMENT '风采详情',
+  `ask` varchar(125) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL COMMENT '风采要求',
+  `total` int NOT NULL COMMENT '报名人数',
+  `active_time` char(19) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL COMMENT '风采时间',
+  `team_id` char(13) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL COMMENT '发布社团',
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `team_id`(`team_id` ASC) USING BTREE,
+  CONSTRAINT `style_ibfk_1` FOREIGN KEY (`team_id`) REFERENCES `teams` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb3 COLLATE = utf8mb3_general_ci COMMENT = '活动信息' ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of style
+-- ----------------------------
+INSERT INTO `style` VALUES ('1679549264062', '测试活动', '11', '11', '11', 1, '2023-03-24 00:00:00', '1642422100000');
 
 -- ----------------------------
 -- Table structure for team_types
