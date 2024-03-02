@@ -1,5 +1,7 @@
 package com.java.controller;
 
+import com.java.dto.IdDto;
+import com.java.dto.UsersPageDto;
 import com.java.entity.Users;
 import com.java.service.UsersService;
 import com.java.utils.DateUtils;
@@ -12,21 +14,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
 /**
- * 系统请求响应控制器
  * 系统用户
  */
 @Controller
 @RequestMapping("/users")
 @Api(tags = "系统用户")
-public class UsersController extends BaseController {
+public class UsersController {
 
     protected static final Logger Log = LoggerFactory.getLogger(UsersController.class);
 
@@ -43,11 +41,11 @@ public class UsersController extends BaseController {
     @PostMapping("/info")
     @ResponseBody
     @ApiOperation("查找指定系统用户")
-    public R getInfo(String id) {
+    public R getInfo(@RequestBody IdDto idDto) {
 
-        Log.info("查找指定系统用户，ID：{}", id);
+        Log.info("查找指定系统用户，ID：{}", idDto.getId());
 
-        Users users = usersService.getOne(id);
+        Users users = usersService.getOne(idDto.getId());
 
         return R.successData(users);
     }
@@ -55,14 +53,14 @@ public class UsersController extends BaseController {
     @PostMapping("/page")
     @ResponseBody
     @ApiOperation("分页查找系统用户")
-    public R getPageInfos(Long pageIndex, Long pageSize,
-                          Users users) {
+    public R getPageInfos(@RequestBody UsersPageDto usersPageDto) {
 
         Log.info("分页查找系统用户，当前页码：{}，"
-                        + "每页数据量：{}, 模糊查询，附加参数：{}", pageIndex,
-                pageSize, users);
+                        + "每页数据量：{}, 模糊查询，附加参数：{}", usersPageDto.getPageIndex(),
+                usersPageDto.getPageSize(), usersPageDto.getUsers());
 
-        PageData page = usersService.getPageInfo(pageIndex, pageSize, users);
+        PageData page = usersService.getPageInfo(usersPageDto.getPageIndex(),
+                usersPageDto.getPageSize(), usersPageDto.getUsers());
 
         return R.successData(page);
     }
@@ -70,9 +68,9 @@ public class UsersController extends BaseController {
     @PostMapping("/add")
     @ResponseBody
     @ApiOperation("添加系统用户")
-    public R addInfo(Users users) {
+    public R addInfo(@RequestBody Users users) {
 
-        if(usersService.getUserByUserName(users.getUserName()) == null){
+        if (usersService.getUserByUserName(users.getUserName()) == null) {
 
             users.setId(IDUtils.makeIDByCurrent());
             users.setCreateTime(DateUtils.getNowDate());
@@ -82,7 +80,7 @@ public class UsersController extends BaseController {
             usersService.add(users);
 
             return R.success();
-        }else{
+        } else {
 
             return R.warn("用户账号已存在，请重新输入");
         }
@@ -91,7 +89,7 @@ public class UsersController extends BaseController {
     @PostMapping("/upd")
     @ResponseBody
     @ApiOperation("修改系统用户")
-    public R updInfo(Users users) {
+    public R updInfo(@RequestBody Users users) {
 
         Log.info("修改系统用户，传入参数：{}", users);
 
@@ -103,18 +101,18 @@ public class UsersController extends BaseController {
     @PostMapping("/del")
     @ResponseBody
     @ApiOperation("删除系统用户")
-    public R delInfo(String id) {
+    public R delInfo(@RequestBody IdDto idDto) {
 
-        if(usersService.isRemove(id)){
-            
-            Log.info("删除系统用户, ID:{}", id);
+        if (usersService.isRemove(idDto.getId())) {
 
-            Users users = usersService.getOne(id);
+            Log.info("删除系统用户, ID:{}", idDto.getId());
+
+            Users users = usersService.getOne(idDto.getId());
 
             usersService.delete(users);
 
             return R.success();
-        }else{
+        } else {
 
             return R.warn("用户存在关联社团，无法移除");
         }

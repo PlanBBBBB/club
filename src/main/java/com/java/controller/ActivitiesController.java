@@ -1,6 +1,8 @@
 package com.java.controller;
 
 import com.java.config.CacheHandle;
+import com.java.dto.ActivePageDto;
+import com.java.dto.IdDto;
 import com.java.entity.Activities;
 import com.java.entity.Users;
 import com.java.service.ActivitiesService;
@@ -13,21 +15,17 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
 /**
- * 系统请求响应控制器
  * 活动信息
  */
 @Controller
 @RequestMapping("/activities")
 @Api(tags = "活动信息")
-public class ActivitiesController extends BaseController {
+public class ActivitiesController {
 
     protected static final Logger Log = LoggerFactory.getLogger(ActivitiesController.class);
 
@@ -51,11 +49,11 @@ public class ActivitiesController extends BaseController {
     @PostMapping("/info")
     @ResponseBody
     @ApiOperation("查找指定活动信息")
-    public R getInfo(String id) {
+    public R getInfo(@RequestBody IdDto idDto) {
 
-        Log.info("查找指定活动信息，ID：{}", id);
+        Log.info("查找指定活动信息，ID：{}", idDto.getId());
 
-        Activities activities = activitiesService.getOne(id);
+        Activities activities = activitiesService.getOne(idDto.getId());
 
         return R.successData(activities);
     }
@@ -63,27 +61,28 @@ public class ActivitiesController extends BaseController {
     @PostMapping("/page")
     @ResponseBody
     @ApiOperation("分页查找活动信息")
-    public R getPageInfos(Long pageIndex, Long pageSize,
-                          String token, String teamName, String activeName) {
+    public R getPageInfos(@RequestBody ActivePageDto activePageDto) {
 
-        Users user = usersService.getOne(cacheHandle.getUserInfoCache(token));
+        Users user = usersService.getOne(cacheHandle.getUserInfoCache(activePageDto.getToken()));
 
         if (user.getType() == 0) {
 
             Log.info("分页查找活动信息，当前页码：{}，"
-                            + "每页数据量：{}, 模糊查询，社团名称：{}，活动名称：{}", pageIndex,
-                    pageSize, teamName, activeName);
+                            + "每页数据量：{}, 模糊查询，社团名称：{}，活动名称：{}", activePageDto.getPageIndex(),
+                    activePageDto.getPageSize(), activePageDto.getTeamName(), activePageDto.getActiveName());
 
-            PageData page = activitiesService.getPageAll(pageIndex, pageSize, teamName, activeName);
+            PageData page = activitiesService.getPageAll(activePageDto.getPageIndex(),
+                    activePageDto.getPageSize(), activePageDto.getTeamName(), activePageDto.getActiveName());
 
             return R.successData(page);
         } else {
 
             Log.info("分页查找活动信息，当前页码：{}，"
-                            + "每页数据量：{}, 模糊查询，社团名称：{}，活动名称：{}", pageIndex,
-                    pageSize, teamName, activeName);
+                            + "每页数据量：{}, 模糊查询，社团名称：{}，活动名称：{}", activePageDto.getPageIndex(),
+                    activePageDto.getPageSize(), activePageDto.getTeamName(), activePageDto.getActiveName());
 
-            PageData page = activitiesService.getPageByUserId(pageIndex, pageSize, user.getId(), teamName, activeName);
+            PageData page = activitiesService.getPageByUserId(activePageDto.getPageIndex(),
+                    activePageDto.getPageSize(), user.getId(), activePageDto.getTeamName(), activePageDto.getActiveName());
 
             return R.successData(page);
         }
@@ -92,7 +91,7 @@ public class ActivitiesController extends BaseController {
     @PostMapping("/add")
     @ResponseBody
     @ApiOperation("添加活动信息")
-    public R addInfo(Activities activities) {
+    public R addInfo(@RequestBody Activities activities) {
 
         activities.setId(IDUtils.makeIDByCurrent());
 
@@ -106,7 +105,7 @@ public class ActivitiesController extends BaseController {
     @PostMapping("/upd")
     @ResponseBody
     @ApiOperation("修改活动信息")
-    public R updInfo(Activities activities) {
+    public R updInfo(@RequestBody Activities activities) {
 
         Log.info("修改活动信息，传入参数：{}", activities);
 
@@ -118,11 +117,11 @@ public class ActivitiesController extends BaseController {
     @PostMapping("/del")
     @ResponseBody
     @ApiOperation("删除活动信息")
-    public R delInfo(String id) {
+    public R delInfo(@RequestBody IdDto idDto) {
 
-        Log.info("删除活动信息, ID:{}", id);
+        Log.info("删除活动信息, ID:{}", idDto.getId());
 
-        Activities activities = activitiesService.getOne(id);
+        Activities activities = activitiesService.getOne(idDto.getId());
 
         activitiesService.delete(activities);
 

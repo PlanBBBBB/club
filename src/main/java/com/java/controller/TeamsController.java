@@ -1,6 +1,8 @@
 package com.java.controller;
 
 import com.java.config.CacheHandle;
+import com.java.dto.IdDto;
+import com.java.dto.TeamsPageDto;
 import com.java.entity.Teams;
 import com.java.entity.Users;
 import com.java.service.TeamsService;
@@ -15,22 +17,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
 
 /**
- * 系统请求响应控制器
  * 社团信息
  */
 @Controller
 @RequestMapping("/teams")
 @Api(tags = "社团信息")
-public class TeamsController extends BaseController {
+public class TeamsController {
 
     protected static final Logger Log = LoggerFactory.getLogger(TeamsController.class);
 
@@ -53,11 +51,11 @@ public class TeamsController extends BaseController {
     @PostMapping("/info")
     @ResponseBody
     @ApiOperation("查找指定社团信息")
-    public R getInfo(String id) {
+    public R getInfo(@RequestBody IdDto idDto) {
 
-        Log.info("查找指定社团信息，ID：{}", id);
+        Log.info("查找指定社团信息，ID：{}", idDto.getId());
 
-        Teams teams = teamsService.getOne(id);
+        Teams teams = teamsService.getOne(idDto.getId());
 
         return R.successData(teams);
     }
@@ -65,7 +63,7 @@ public class TeamsController extends BaseController {
     @PostMapping("/all")
     @ResponseBody
     @ApiOperation("获取全部的社团")
-    public R getAll(){
+    public R getAll() {
 
         Log.info("获取全部的社团");
 
@@ -77,11 +75,11 @@ public class TeamsController extends BaseController {
     @PostMapping("/man")
     @ResponseBody
     @ApiOperation("获取指定社团管理员相关的社团列表")
-    public R getListByManId(String manId){
+    public R getListByManId(@RequestBody IdDto idDto) {
 
         Log.info("获取指定社团管理员相关的社团列表");
 
-        List<Teams> list = teamsService.getListByManId(manId);
+        List<Teams> list = teamsService.getListByManId(idDto.getId());
 
         return R.successData(list);
     }
@@ -89,21 +87,21 @@ public class TeamsController extends BaseController {
     @PostMapping("/page")
     @ResponseBody
     @ApiOperation("分页获取社团信息")
-    public R getPageInfos(Long pageIndex, Long pageSize,
-                         String token, Teams teams) {
+    public R getPageInfos(@RequestBody TeamsPageDto teamsPageDto) {
 
-        Users user = usersService.getOne(cacheHandle.getUserInfoCache(token));
+        Users user = usersService.getOne(cacheHandle.getUserInfoCache(teamsPageDto.getToken()));
 
-        if(user.getType() == 1){
+        if (user.getType() == 1) {
 
-            teams.setManager(user.getId());
+            teamsPageDto.getTeams().setManager(user.getId());
         }
 
         Log.info("分页查找社团信息，当前页码：{}，"
-                        + "每页数据量：{}, 模糊查询，附加参数：{}", pageIndex,
-                pageSize, teams);
+                        + "每页数据量：{}, 模糊查询，附加参数：{}", teamsPageDto.getPageIndex(),
+                teamsPageDto.getPageSize(), teamsPageDto.getTeams());
 
-        PageData page = teamsService.getPageInfo(pageIndex, pageSize, teams);
+        PageData page = teamsService.getPageInfo(teamsPageDto.getPageIndex(),
+                teamsPageDto.getPageSize(), teamsPageDto.getTeams());
 
         return R.successData(page);
     }
@@ -111,7 +109,7 @@ public class TeamsController extends BaseController {
     @PostMapping("/add")
     @ResponseBody
     @ApiOperation("添加社团信息")
-    public R addInfo(Teams teams) {
+    public R addInfo(@RequestBody Teams teams) {
 
         teams.setId(IDUtils.makeIDByCurrent());
         teams.setCreateTime(DateUtils.getNowDate("yyyy-MM-dd"));
@@ -126,7 +124,7 @@ public class TeamsController extends BaseController {
     @PostMapping("/upd")
     @ResponseBody
     @ApiOperation("修改社团信息")
-    public R updInfo(Teams teams) {
+    public R updInfo(@RequestBody Teams teams) {
 
         Log.info("修改社团信息，传入参数：{}", teams);
 
@@ -138,11 +136,11 @@ public class TeamsController extends BaseController {
     @PostMapping("/del")
     @ResponseBody
     @ApiOperation("删除社团信息")
-    public R delInfo(String id) {
+    public R delInfo(@RequestBody IdDto idDto) {
 
-        Log.info("删除社团信息, ID:{}", id);
+        Log.info("删除社团信息, ID:{}", idDto.getId());
 
-        Teams teams = teamsService.getOne(id);
+        Teams teams = teamsService.getOne(idDto.getId());
 
         teamsService.delete(teams);
 

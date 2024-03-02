@@ -1,6 +1,8 @@
 package com.java.controller;
 
 import com.java.config.CacheHandle;
+import com.java.dto.AddActivelogsDto;
+import com.java.dto.IdDto;
 import com.java.entity.ActiveLogs;
 import com.java.entity.Users;
 import com.java.service.ActiveLogsService;
@@ -13,23 +15,19 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 
 /**
- * 系统请求响应控制器
  * 报名记录
  */
 @Controller
 @RequestMapping("/activeLogs")
 @Api(tags = "报名记录")
-public class ActiveLogsController extends BaseController {
+public class ActiveLogsController {
 
     protected static final Logger Log = LoggerFactory.getLogger(ActiveLogsController.class);
 
@@ -52,11 +50,11 @@ public class ActiveLogsController extends BaseController {
     @PostMapping("/info")
     @ResponseBody
     @ApiOperation(value = "获取指定报名记录")
-    public R getInfo(String id) {
+    public R getInfo(@RequestBody IdDto idDto) {
 
-        Log.info("查找指定报名记录，ID：{}", id);
+        Log.info("查找指定报名记录，ID：{}", idDto.getId());
 
-        ActiveLogs activeLogs = activeLogsService.getOne(id);
+        ActiveLogs activeLogs = activeLogsService.getOne(idDto.getId());
 
         return R.successData(activeLogs);
     }
@@ -64,11 +62,11 @@ public class ActiveLogsController extends BaseController {
     @PostMapping("/list")
     @ResponseBody
     @ApiOperation(value = "获取指定活动的报名记录")
-    public R getList(String activeId) {
+    public R getList(@RequestBody IdDto idDto) {
 
-        Log.info("获取指定活动的报名记录，活动ID：{}", activeId);
+        Log.info("获取指定活动的报名记录，活动ID：{}", idDto.getId());
 
-        List<Map<String, Object>> list = activeLogsService.getListByActiveId(activeId);
+        List<Map<String, Object>> list = activeLogsService.getListByActiveId(idDto.getId());
 
         return R.successData(list);
     }
@@ -76,22 +74,22 @@ public class ActiveLogsController extends BaseController {
     @PostMapping("/add")
     @ResponseBody
     @ApiOperation(value = "添加报名记录")
-    public R addInfo(String token, ActiveLogs activeLogs) {
+    public R addInfo(@RequestBody AddActivelogsDto addActivelogsDto) {
 
-        Users user = usersService.getOne(cacheHandle.getUserInfoCache(token));
+        Users user = usersService.getOne(cacheHandle.getUserInfoCache(addActivelogsDto.getToken()));
 
-        if(activeLogsService.isActive(activeLogs.getActiveId(), user.getId())){
+        if (activeLogsService.isActive(addActivelogsDto.getActiveId(), user.getId())) {
 
-            activeLogs.setId(IDUtils.makeIDByCurrent());
-            activeLogs.setUserId(user.getId());
-            activeLogs.setCreateTime(DateUtils.getNowDate());
+            addActivelogsDto.setId(IDUtils.makeIDByCurrent());
+            addActivelogsDto.setUserId(user.getId());
+            addActivelogsDto.setCreateTime(DateUtils.getNowDate());
 
-            Log.info("添加报名记录，传入参数：{}", activeLogs);
+            Log.info("添加报名记录，传入参数：{}", addActivelogsDto);
 
-            activeLogsService.add(activeLogs);
+            activeLogsService.add(addActivelogsDto);
 
             return R.success();
-        }else{
+        } else {
 
             return R.warn("该活动您已参与，请勿重复报名");
         }
@@ -100,7 +98,7 @@ public class ActiveLogsController extends BaseController {
     @PostMapping("/upd")
     @ResponseBody
     @ApiOperation(value = "修改报名记录")
-    public R updInfo(ActiveLogs activeLogs) {
+    public R updInfo(@RequestBody ActiveLogs activeLogs) {
 
         Log.info("修改报名记录，传入参数：{}", activeLogs);
 
@@ -112,11 +110,11 @@ public class ActiveLogsController extends BaseController {
     @PostMapping("/del")
     @ResponseBody
     @ApiOperation(value = "删除报名记录")
-    public R delInfo(String id) {
+    public R delInfo(@RequestBody IdDto idDto) {
 
-        Log.info("删除报名记录, ID:{}", id);
+        Log.info("删除报名记录, ID:{}", idDto.getId());
 
-        ActiveLogs activeLogs = activeLogsService.getOne(id);
+        ActiveLogs activeLogs = activeLogsService.getOne(idDto.getId());
 
         activeLogsService.delete(activeLogs);
 

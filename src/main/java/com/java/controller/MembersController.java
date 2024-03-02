@@ -1,6 +1,8 @@
 package com.java.controller;
 
 import com.java.config.CacheHandle;
+import com.java.dto.ApplylogsOrUserPageDto;
+import com.java.dto.IdDto;
 import com.java.entity.Members;
 import com.java.entity.Users;
 import com.java.service.MembersService;
@@ -13,22 +15,17 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
 /**
- * 系统请求响应控制器
  * 成员信息
  */
 @Controller
 @RequestMapping("/members")
 @Api(tags = "成员信息")
-public class
-MembersController extends BaseController {
+public class MembersController {
 
     protected static final Logger Log = LoggerFactory.getLogger(MembersController.class);
 
@@ -51,11 +48,11 @@ MembersController extends BaseController {
     @PostMapping("/info")
     @ResponseBody
     @ApiOperation("查找指定成员信息")
-    public R getInfo(String id) {
+    public R getInfo(@RequestBody IdDto idDto) {
 
-        Log.info("查找指定成员信息，ID：{}", id);
+        Log.info("查找指定成员信息，ID：{}", idDto.getId());
 
-        Members members = membersService.getOne(id);
+        Members members = membersService.getOne(idDto.getId());
 
         return R.successData(members);
     }
@@ -63,27 +60,28 @@ MembersController extends BaseController {
     @PostMapping("/page")
     @ResponseBody
     @ApiOperation("分页查找成员信息")
-    public R getPageInfos(Long pageIndex, Long pageSize,
-                          String token, String teamName, String userName) {
+    public R getPageInfos(@RequestBody ApplylogsOrUserPageDto applylogsOrUserPageDto) {
 
-        Users user = usersService.getOne(cacheHandle.getUserInfoCache(token));
+        Users user = usersService.getOne(cacheHandle.getUserInfoCache(applylogsOrUserPageDto.getToken()));
 
         if (user.getType() == 0) {
 
             Log.info("分页查找成员信息，当前页码：{}，"
-                            + "每页数据量：{}, 模糊查询，团队名称：{}，用户姓名：{}", pageIndex,
-                    pageSize, teamName, userName);
+                            + "每页数据量：{}, 模糊查询，团队名称：{}，用户姓名：{}", applylogsOrUserPageDto.getPageIndex(),
+                    applylogsOrUserPageDto.getPageIndex(), applylogsOrUserPageDto.getTeamName(), applylogsOrUserPageDto.getUserName());
 
-            PageData page = membersService.getPageAll(pageIndex, pageSize, teamName, userName);
+            PageData page = membersService.getPageAll(applylogsOrUserPageDto.getPageIndex(),
+                    applylogsOrUserPageDto.getPageIndex(), applylogsOrUserPageDto.getTeamName(), applylogsOrUserPageDto.getUserName());
 
             return R.successData(page);
         } else {
 
             Log.info("分页查找成员信息，当前页码：{}，"
-                            + "每页数据量：{}, 模糊查询，团队名称：{}，用户姓名：{}", pageIndex,
-                    pageSize, teamName, userName);
+                            + "每页数据量：{}, 模糊查询，团队名称：{}，用户姓名：{}", applylogsOrUserPageDto.getPageIndex(),
+                    applylogsOrUserPageDto.getPageIndex(), applylogsOrUserPageDto.getTeamName(), applylogsOrUserPageDto.getUserName());
 
-            PageData page = membersService.getPageByManId(pageIndex, pageSize, user.getId(), teamName, userName);
+            PageData page = membersService.getPageByManId(applylogsOrUserPageDto.getPageIndex(),
+                    applylogsOrUserPageDto.getPageIndex(), user.getId(), applylogsOrUserPageDto.getTeamName(), applylogsOrUserPageDto.getUserName());
 
             return R.successData(page);
         }
@@ -93,7 +91,7 @@ MembersController extends BaseController {
     @PostMapping("/add")
     @ResponseBody
     @ApiOperation("添加成员信息")
-    public R addInfo(Members members) {
+    public R addInfo(@RequestBody Members members) {
 
         members.setId(IDUtils.makeIDByCurrent());
 
@@ -107,7 +105,7 @@ MembersController extends BaseController {
     @PostMapping("/upd")
     @ResponseBody
     @ApiOperation("修改成员信息")
-    public R updInfo(Members members) {
+    public R updInfo(@RequestBody Members members) {
 
         Log.info("修改成员信息，传入参数：{}", members);
 
@@ -119,16 +117,16 @@ MembersController extends BaseController {
     @PostMapping("/del")
     @ResponseBody
     @ApiOperation("删除成员信息")
-    public R delInfo(String id) {
+    public R delInfo(@RequestBody IdDto idDto) {
 
-        Members members = membersService.getOne(id);
+        Members members = membersService.getOne(idDto.getId());
 
-        if(membersService.isManager(members.getTeamId(), members.getUserId())){
+        if (membersService.isManager(members.getTeamId(), members.getUserId())) {
 
             return R.warn("社团管理员无法移除");
-        }else{
+        } else {
 
-            Log.info("删除成员信息, ID:{}", id);
+            Log.info("删除成员信息, ID:{}", idDto.getId());
 
             membersService.delete(members);
 

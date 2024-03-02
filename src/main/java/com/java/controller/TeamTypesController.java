@@ -1,5 +1,7 @@
 package com.java.controller;
 
+import com.java.dto.IdDto;
+import com.java.dto.TeamTypesPageDto;
 import com.java.entity.TeamTypes;
 import com.java.service.TeamTypesService;
 import com.java.utils.DateUtils;
@@ -10,27 +12,23 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
- * 系统请求响应控制器
  * 社团类型
  */
 @Controller
 @RequestMapping("/teamTypes")
 @Api(tags = "社团类型管理")
-public class TeamTypesController extends BaseController {
+public class TeamTypesController {
 
     protected static final Logger Log = LoggerFactory.getLogger(TeamTypesController.class);
 
-    @Autowired
+    @Resource
     private TeamTypesService teamTypesService;
 
     @PostMapping("")
@@ -43,7 +41,7 @@ public class TeamTypesController extends BaseController {
     @PostMapping("/all")
     @ResponseBody
     @ApiOperation("查看全部的社团类型信息")
-    public R getAll(){
+    public R getAll() {
 
         Log.info("查看全部的社团类型信息");
 
@@ -55,11 +53,11 @@ public class TeamTypesController extends BaseController {
     @PostMapping("/info")
     @ResponseBody
     @ApiOperation("查找指定社团类型")
-    public R getInfo(String id) {
+    public R getInfo(@RequestBody IdDto idDto) {
 
-        Log.info("查找指定社团类型，ID：{}", id);
+        Log.info("查找指定社团类型，ID：{}", idDto.getId());
 
-        TeamTypes teamTypes = teamTypesService.getOne(id);
+        TeamTypes teamTypes = teamTypesService.getOne(idDto.getId());
 
         return R.successData(teamTypes);
     }
@@ -67,14 +65,14 @@ public class TeamTypesController extends BaseController {
     @PostMapping("/page")
     @ResponseBody
     @ApiOperation("分页查找社团类型")
-    public R getPageInfos(Long pageIndex, Long pageSize,
-                          TeamTypes teamTypes) {
+    public R getPageInfos(@RequestBody TeamTypesPageDto teamTypesPageDto) {
 
         Log.info("分页查找社团类型，当前页码：{}，"
-                        + "每页数据量：{}, 模糊查询，附加参数：{}", pageIndex,
-                pageSize, teamTypes);
+                        + "每页数据量：{}, 模糊查询，附加参数：{}", teamTypesPageDto.getPageIndex(),
+                teamTypesPageDto.getPageSize(), teamTypesPageDto.getTeamTypes());
 
-        PageData page = teamTypesService.getPageInfo(pageIndex, pageSize, teamTypes);
+        PageData page = teamTypesService.getPageInfo(teamTypesPageDto.getPageIndex(),
+                teamTypesPageDto.getPageSize(), teamTypesPageDto.getTeamTypes());
 
         return R.successData(page);
     }
@@ -82,7 +80,7 @@ public class TeamTypesController extends BaseController {
     @PostMapping("/add")
     @ResponseBody
     @ApiOperation("添加社团类型")
-    public R addInfo(TeamTypes teamTypes) {
+    public R addInfo(@RequestBody TeamTypes teamTypes) {
 
         teamTypes.setId(IDUtils.makeIDByCurrent());
         teamTypes.setCreateTime(DateUtils.getNowDate());
@@ -97,7 +95,7 @@ public class TeamTypesController extends BaseController {
     @PostMapping("/upd")
     @ResponseBody
     @ApiOperation("修改社团类型")
-    public R updInfo(TeamTypes teamTypes) {
+    public R updInfo(@RequestBody TeamTypes teamTypes) {
 
         Log.info("修改社团类型，传入参数：{}", teamTypes);
 
@@ -109,18 +107,18 @@ public class TeamTypesController extends BaseController {
     @PostMapping("/del")
     @ResponseBody
     @ApiOperation("删除社团类型")
-    public R delInfo(String id) {
+    public R delInfo(@RequestBody IdDto idDto) {
 
-        if(teamTypesService.isRemove(id)){
+        if (teamTypesService.isRemove(idDto.getId())) {
 
-            Log.info("删除社团类型, ID:{}", id);
+            Log.info("删除社团类型, ID:{}", idDto.getId());
 
-            TeamTypes teamTypes = teamTypesService.getOne(id);
+            TeamTypes teamTypes = teamTypesService.getOne(idDto.getId());
 
             teamTypesService.delete(teamTypes);
 
             return R.success();
-        }else{
+        } else {
 
             return R.warn("存在关联社团，无法移除");
         }
