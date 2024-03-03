@@ -56,11 +56,11 @@ public class UsersController {
     public R getPageInfos(@RequestBody UsersPageDto usersPageDto) {
 
         Log.info("分页查找系统用户，当前页码：{}，"
-                        + "每页数据量：{}, 模糊查询，附加参数：{}", usersPageDto.getPageIndex(),
-                usersPageDto.getPageSize(), usersPageDto.getUsers());
+                        + "每页数据量：{}, 模糊查询，附加参数：{},{},{}", usersPageDto.getPageIndex(),
+                usersPageDto.getPageSize(), usersPageDto.getName(), usersPageDto.getUserName(), usersPageDto.getPhone());
 
         PageData page = usersService.getPageInfo(usersPageDto.getPageIndex(),
-                usersPageDto.getPageSize(), usersPageDto.getUsers());
+                usersPageDto.getPageSize(), usersPageDto.getName(), usersPageDto.getUserName(), usersPageDto.getPhone());
 
         return R.successData(page);
     }

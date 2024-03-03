@@ -1,5 +1,6 @@
 package com.java.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.java.dao.MembersDao;
@@ -51,7 +52,7 @@ public class UsersServiceImpl implements UsersService {
 
     @Override
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-    public Boolean isRemove(String userId){
+    public Boolean isRemove(String userId) {
 
         QueryWrapper<Members> qw = new QueryWrapper<Members>();
         qw.eq("user_id", userId);
@@ -83,33 +84,51 @@ public class UsersServiceImpl implements UsersService {
     }
 
     @Override
-    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-    public PageData getPageInfo(Long pageIndex, Long pageSize, Users users) {
-
-        QueryWrapper<Users> qw = new QueryWrapper<Users>();
-
-        if (StringUtils.isNotNullOrEmpty(users.getUserName())) {
-
-            qw.like("user_name", users.getUserName());
-        }
-
-        if (StringUtils.isNotNullOrEmpty(users.getName())) {
-
-            qw.like("name", users.getName());
-        }
-
-        if (StringUtils.isNotNullOrEmpty(users.getPhone())) {
-
-            qw.like("phone", users.getPhone());
-        }
-
-        qw.orderByDesc("create_time");
-
-        Page<Users> page =
-                usersDao.selectPage(new Page<Users>(pageIndex, pageSize), qw);
-
+    public PageData getPageInfo(Long pageIndex, Long pageSize, String name, String userName, String phone) {
+        LambdaQueryWrapper<Users> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.like(StringUtils.isNotNullOrEmpty(userName), Users::getUserName, userName)
+                .like(StringUtils.isNotNullOrEmpty(name), Users::getName, name)
+                .like(StringUtils.isNotNullOrEmpty(phone), Users::getPhone, phone)
+                .orderByDesc(Users::getCreateTime);
+        Page<Users> page = usersDao.selectPage(new Page<Users>(pageIndex, pageSize), queryWrapper);
         return parsePage(page);
     }
+
+//    @Override
+//    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+//    public PageData getPageInfo(Long pageIndex, Long pageSize, Users users) {
+//
+//        LambdaQueryWrapper<Users> queryWrapper = new LambdaQueryWrapper<>();
+//        queryWrapper.like(StringUtils.isNotNullOrEmpty(users.getUserName()), Users::getUserName, "%" + users.getUserName() + "%")
+//                .like(StringUtils.isNotNullOrEmpty(users.getName()), Users::getName, "%" + users.getName() + "%")
+//                .like(StringUtils.isNotNullOrEmpty(users.getPhone()), Users::getPhone, "%" + users.getPhone() + "%")
+//                .orderByDesc(Users::getCreateTime);
+//
+////        QueryWrapper<Users> qw = new QueryWrapper<Users>();
+////
+////        if (StringUtils.isNotNullOrEmpty(users.getUserName())) {
+////
+////            qw.like("user_name", users.getUserName());
+////        }
+////
+////        if (StringUtils.isNotNullOrEmpty(users.getName())) {
+////
+////            qw.like("name", users.getName());
+////        }
+////
+////        if (StringUtils.isNotNullOrEmpty(users.getPhone())) {
+////
+////            qw.like("phone", users.getPhone());
+////        }
+//
+////        qw.orderByDesc("create_time");
+//
+//
+//        Page<Users> page =
+//                usersDao.selectPage(new Page<Users>(pageIndex, pageSize), queryWrapper);
+//
+//        return parsePage(page);
+//    }
 
     /**
      * 转化分页查询的结果
