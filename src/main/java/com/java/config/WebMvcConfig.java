@@ -6,6 +6,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
@@ -68,20 +71,35 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
                 .build();
     }
 
-    @Override
-    protected void addCorsMappings(CorsRegistry registry) {
-        log.info("CORS configuration is being applied.");
-        // 设置允许跨域的路径
-        registry.addMapping("/**")
-                // 设置允许跨域请求的域名
-                .allowedOrigins("*")
-                // 是否允许携带 cookie
-                .allowCredentials(true)
-                // 设置允许的请求方式
-                .allowedMethods("GET", "POST", "DELETE", "PUT", "PATCH")
-                // 设置允许的 header 属性
-                .allowedHeaders("*")
-                // 跨域允许时间
-                .maxAge(3600);
+//    @Override
+//    protected void addCorsMappings(CorsRegistry registry) {
+//        log.info("CORS configuration is being applied.");
+//        // 设置允许跨域的路径
+//        registry.addMapping("/**")
+//                // 设置允许跨域请求的域名
+//                .allowedOrigins("*")
+//                // 是否允许携带 cookie
+//                .allowCredentials(true)
+//                // 设置允许的请求方式
+//                .allowedMethods("GET", "POST", "DELETE", "PUT", "PATCH")
+//                // 设置允许的 header 属性
+//                .allowedHeaders("*")
+//                // 跨域允许时间
+//                .maxAge(3600);
+//    }
+
+    // 当前跨域请求最大有效时长。这里默认1天
+    private static final long MAX_AGE = 24 * 60 * 60;
+
+    @Bean
+    public CorsFilter corsFilter() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration corsConfiguration = new CorsConfiguration();
+        corsConfiguration.addAllowedOrigin("*"); // 1 设置访问源地址
+        corsConfiguration.addAllowedHeader("*"); // 2 设置访问源请求头
+        corsConfiguration.addAllowedMethod("*"); // 3 设置访问源请求方法
+        corsConfiguration.setMaxAge(MAX_AGE);
+        source.registerCorsConfiguration("/**", corsConfiguration); // 4 对接口配置跨域设置
+        return new CorsFilter(source);
     }
 }
