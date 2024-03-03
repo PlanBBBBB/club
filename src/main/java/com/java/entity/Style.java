@@ -47,4 +47,8 @@ public class Style implements Serializable {
     @TableField(value = "team_id")
     @ApiModelProperty(value = "发布社团")
     private String teamId;
+
+    @TableField(value = "pictures_url")
+    @ApiModelProperty(value = "活动图片")
+    private String picturesUrl;
 }

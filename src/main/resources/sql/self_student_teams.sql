@@ -11,7 +11,7 @@
  Target Server Version : 80100 (8.1.0)
  File Encoding         : 65001
 
- Date: 02/03/2024 20:24:33
+ Date: 03/03/2024 20:30:46
 */
 
 SET NAMES utf8mb4;
@@ -51,6 +51,7 @@ CREATE TABLE `activities`  (
   `total` int NOT NULL COMMENT '报名人数',
   `active_time` char(19) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL COMMENT '活动时间',
   `team_id` char(13) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL COMMENT '发布社团',
+  `pictures_url` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NULL DEFAULT NULL COMMENT '活动图片',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `team_id`(`team_id` ASC) USING BTREE,
   CONSTRAINT `activities_ibfk_1` FOREIGN KEY (`team_id`) REFERENCES `teams` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
@@ -59,7 +60,7 @@ CREATE TABLE `activities`  (
 -- ----------------------------
 -- Records of activities
 -- ----------------------------
-INSERT INTO `activities` VALUES ('1679549264062', '测试活动', '11', '11', '11', 1, '2023-03-24 00:00:00', '1642422100000');
+INSERT INTO `activities` VALUES ('1679549264062', '测试活动', '11', '11', '11', 1, '2023-03-24 00:00:00', '1642422100000', NULL);
 
 -- ----------------------------
 -- Table structure for apply_logs
@@ -178,6 +179,7 @@ CREATE TABLE `style`  (
   `total` int NOT NULL COMMENT '报名人数',
   `active_time` char(19) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL COMMENT '风采时间',
   `team_id` char(13) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL COMMENT '发布社团',
+  `pictures_url` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NULL DEFAULT NULL COMMENT '图片',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `team_id`(`team_id` ASC) USING BTREE,
   CONSTRAINT `style_ibfk_1` FOREIGN KEY (`team_id`) REFERENCES `teams` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
@@ -186,7 +188,7 @@ CREATE TABLE `style`  (
 -- ----------------------------
 -- Records of style
 -- ----------------------------
-INSERT INTO `style` VALUES ('1679549264062', '测试活动', '11', '11', '11', 1, '2023-03-24 00:00:00', '1642422100000');
+INSERT INTO `style` VALUES ('1679549264062', '测试活动', '11', '11', '11', 1, '2023-03-24 00:00:00', '1642422100000', NULL);
 
 -- ----------------------------
 -- Table structure for team_types
