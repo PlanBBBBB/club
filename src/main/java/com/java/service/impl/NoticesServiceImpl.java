@@ -62,15 +62,13 @@ public class NoticesServiceImpl implements NoticesService {
 
     @Override
     public PageData getPageAll(Long pageIndex, Long pageSize, String title, String teamName){
-        Page<Map<String, Object>>  page =
-                noticesDao.qryPageAll(new Page<>(pageIndex, pageSize), title, teamName);
+        Page<Map<String, Object>>  page = noticesDao.qryPageAll(new Page<>(pageIndex, pageSize), title, teamName);
         return parsePage(page);
     }
 
     @Override
     public PageData getPageById(Long pageIndex, Long pageSize, String userId, String title, String teamName){
-        Page<Map<String, Object>>  page =
-                noticesDao.qryPageById(new Page<>(pageIndex, pageSize), userId, title, teamName);
+        Page<Map<String, Object>>  page = noticesDao.qryPageById(new Page<>(pageIndex, pageSize), userId, title, teamName);
         return parsePage(page);
     }
 

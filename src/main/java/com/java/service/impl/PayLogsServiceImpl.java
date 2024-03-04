@@ -38,15 +38,13 @@ public class PayLogsServiceImpl implements PayLogsService {
 
     @Override
     public PageData getManPageInfo(Long pageIndex, Long pageSize, String userId, String teamName, String userName) {
-        Page<Map<String, Object>> page =
-                payLogsDao.qryManPageInfo(new Page<>(pageIndex, pageSize), userId, teamName, userName);
+        Page<Map<String, Object>> page = payLogsDao.qryManPageInfo(new Page<>(pageIndex, pageSize), userId, teamName, userName);
         return parsePage(page);
     }
 
     @Override
     public PageData getPageInfo(Long pageIndex, Long pageSize, String userId, String teamName, String userName) {
-        Page<Map<String, Object>> page =
-                payLogsDao.qryPageInfo(new Page<>(pageIndex, pageSize), userId, teamName, userName);
+        Page<Map<String, Object>> page = payLogsDao.qryPageInfo(new Page<>(pageIndex, pageSize), userId, teamName, userName);
         return parsePage(page);
     }
 

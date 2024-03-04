@@ -1,6 +1,6 @@
 package com.java.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.java.dao.ApplyLogsDao;
 import com.java.dao.MembersDao;
@@ -59,11 +59,11 @@ public class ApplyLogsServiceImpl implements ApplyLogsService {
 
     @Override
     public Boolean isApply(String userId, String teamId){
-        QueryWrapper<ApplyLogs> qw = new QueryWrapper<>();
-        qw.eq("user_id", userId);
-        qw.eq("team_id", teamId);
-        qw.eq("status", 0);
-        return applyLogsDao.selectCount(qw) <= 0;
+        LambdaQueryWrapper<ApplyLogs> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(ApplyLogs::getUserId, userId)
+                .eq(ApplyLogs::getTeamId, teamId)
+                .eq(ApplyLogs::getStatus, 0);
+        return applyLogsDao.selectCount(queryWrapper) <= 0;
     }
 
     @Override

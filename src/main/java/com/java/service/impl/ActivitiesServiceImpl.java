@@ -1,6 +1,6 @@
 package com.java.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.java.dao.ActiveLogsDao;
 import com.java.dao.ActivitiesDao;
@@ -51,9 +51,9 @@ public class ActivitiesServiceImpl implements ActivitiesService {
     @Override
     @Transactional
     public void delete(Activities activities) {
-        QueryWrapper<ActiveLogs> qw = new QueryWrapper<>();
-        qw.eq("active_id", activities.getId());
-        activeLogsDao.delete(qw);
+        LambdaQueryWrapper<ActiveLogs> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(ActiveLogs::getActiveId, activities.getId());
+        activeLogsDao.delete(queryWrapper);
         activitiesDao.deleteById(activities);
     }
 

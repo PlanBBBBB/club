@@ -53,25 +53,20 @@ public class TeamsServiceImpl implements TeamsService {
     @Override
     @Transactional
     public void add(Teams teams) {
-
         teamsDao.insert(teams);
-
         Members member = new Members();
         member.setId(IDUtils.makeIDByCurrent());
         member.setUserId(teams.getManager());
         member.setTeamId(teams.getId());
         member.setCreateTime(DateUtils.getNowDate());
         membersDao.insert(member);
-
         Users user = usersDao.selectById(teams.getManager());
         user.setType(1);
         usersDao.updateById(user);
     }
 
     @Override
-    @Transactional
     public void update(Teams teams) {
-
         teamsDao.updateById(teams);
     }
 

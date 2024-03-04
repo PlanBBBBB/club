@@ -1,6 +1,6 @@
 package com.java.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.java.dao.ActiveLogsDao;
 import com.java.dao.ActivitiesDao;
 import com.java.dao.UsersDao;
@@ -51,10 +51,9 @@ public class ActiveLogsServiceImpl implements ActiveLogsService {
 
     @Override
     public Boolean isActive(String activeId, String userId){
-        QueryWrapper<ActiveLogs> qw = new QueryWrapper<>();
-        qw.eq("active_id", activeId);
-        qw.eq("user_id", userId);
-        return activeLogsDao.selectCount(qw) <= 0;
+        LambdaQueryWrapper<ActiveLogs> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(ActiveLogs::getActiveId, activeId).eq(ActiveLogs::getUserId, userId);
+        return activeLogsDao.selectCount(queryWrapper) <= 0;
     }
 
     @Override
@@ -67,11 +66,9 @@ public class ActiveLogsServiceImpl implements ActiveLogsService {
 
         List<Map<String, Object>> resl = new ArrayList<>();
 
-        QueryWrapper<ActiveLogs> qw = new QueryWrapper<>();
-        qw.eq("active_id", activeId);
-        qw.orderByDesc("create_time");
-
-        List<ActiveLogs> activeLogs = activeLogsDao.selectList(qw);
+        LambdaQueryWrapper<ActiveLogs> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(ActiveLogs::getActiveId, activeId).orderByDesc(ActiveLogs::getCreateTime);
+        List<ActiveLogs> activeLogs = activeLogsDao.selectList(queryWrapper);
 
         for (ActiveLogs activeLog : activeLogs) {
             Map<String, Object> temp = new HashMap<>();

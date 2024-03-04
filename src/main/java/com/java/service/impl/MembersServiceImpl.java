@@ -1,6 +1,6 @@
 package com.java.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.java.dao.*;
 import com.java.entity.*;
@@ -44,16 +44,16 @@ public class MembersServiceImpl implements MembersService {
     @Transactional
     public void delete(Members members) {
 
-        QueryWrapper<PayLogs> qw_pay = new QueryWrapper<>();
-        qw_pay.eq("user_id", members.getUserId());
+        LambdaQueryWrapper<PayLogs> qw_pay = new LambdaQueryWrapper<>();
+        qw_pay.eq(PayLogs::getUserId, members.getUserId());
         payLogsDao.delete(qw_pay);
 
-        QueryWrapper<ActiveLogs> qw_active = new QueryWrapper<>();
-        qw_active.eq("user_id", members.getUserId());
+        LambdaQueryWrapper<ActiveLogs> qw_active = new LambdaQueryWrapper<>();
+        qw_active.eq(ActiveLogs::getUserId, members.getUserId());
         activeLogsDao.delete(qw_active);
 
-        QueryWrapper<ApplyLogs> qw_apply = new QueryWrapper<>();
-        qw_apply.eq("user_id", members.getUserId());
+        LambdaQueryWrapper<ApplyLogs> qw_apply = new LambdaQueryWrapper<>();
+        qw_apply.eq(ApplyLogs::getUserId, members.getUserId());
         applyLogsDao.delete(qw_apply);
 
         membersDao.deleteById(members);
@@ -70,23 +70,20 @@ public class MembersServiceImpl implements MembersService {
 
     @Override
     public Boolean isManager(String teamId, String userId){
-        QueryWrapper<Teams> qw = new QueryWrapper<>();
-        qw.eq("manager", userId);
-        qw.eq("id", teamId);
-        return teamsDao.selectCount(qw) > 0;
+        LambdaQueryWrapper<Teams> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Teams::getId, teamId).eq(Teams::getManager, userId);
+        return teamsDao.selectCount(queryWrapper) > 0;
     }
 
     @Override
     public PageData getPageAll(Long pageIndex, Long pageSize, String teamName, String userName) {
-        Page<Map<String, Object>> page =
-                membersDao.qryPageAll(new Page<>(pageIndex, pageSize), teamName, userName);
+        Page<Map<String, Object>> page = membersDao.qryPageAll(new Page<>(pageIndex, pageSize), teamName, userName);
         return parsePage(page);
     }
 
     @Override
     public PageData getPageByManId(Long pageIndex, Long pageSize, String manId, String teamName, String userName) {
-        Page<Map<String, Object>> page =
-                membersDao.qryPageByManId(new Page<>(pageIndex, pageSize), manId, teamName, userName);
+        Page<Map<String, Object>> page = membersDao.qryPageByManId(new Page<>(pageIndex, pageSize), manId, teamName, userName);
         return parsePage(page);
     }
 
