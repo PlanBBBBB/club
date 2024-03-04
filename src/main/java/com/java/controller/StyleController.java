@@ -41,7 +41,6 @@ public class StyleController {
     @PostMapping("")
     @ApiOperation("风采信息首页")
     public String index() {
-
         return "pages/Style";
     }
 
@@ -49,11 +48,8 @@ public class StyleController {
     @ResponseBody
     @ApiOperation("查找指定风采信息")
     public R getInfo(@RequestBody IdDto idDto) {
-
         Log.info("查找指定风采信息，ID：{}", idDto.getId());
-
         Style style = styleService.getOne(idDto.getId());
-
         return R.successData(style);
     }
 
@@ -61,28 +57,20 @@ public class StyleController {
     @ResponseBody
     @ApiOperation("分页查找风采信息")
     public R getPageInfos(@RequestBody ActivePageDto activePageDto) {
-
         Users user = usersService.getOne(cacheHandle.getUserInfoCache(activePageDto.getToken()));
-
         if (user.getType() == 0) {
-
             Log.info("分页查找风采信息，当前页码：{}，"
                             + "每页数据量：{}, 模糊查询，社团名称：{}，风采名称：{}", activePageDto.getPageIndex(),
                     activePageDto.getPageSize(), activePageDto.getTeamName(), activePageDto.getActiveName());
-
             PageData page = styleService.getPageAll(activePageDto.getPageIndex(),
                     activePageDto.getPageSize(), activePageDto.getTeamName(), activePageDto.getActiveName());
-
             return R.successData(page);
         } else {
-
             Log.info("分页查找风采信息，当前页码：{}，"
                             + "每页数据量：{}, 模糊查询，社团名称：{}，风采名称：{}", activePageDto.getPageIndex(),
                     activePageDto.getPageSize(), activePageDto.getTeamName(), activePageDto.getActiveName());
-
             PageData page = styleService.getPageByUserId(activePageDto.getPageIndex(),
                     activePageDto.getPageSize(), user.getId(), activePageDto.getTeamName(), activePageDto.getActiveName());
-
             return R.successData(page);
         }
     }

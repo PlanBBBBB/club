@@ -15,7 +15,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -76,11 +75,8 @@ public class TeamsController {
     @ResponseBody
     @ApiOperation("获取指定社团管理员相关的社团列表")
     public R getListByManId(@RequestBody IdDto idDto) {
-
         Log.info("获取指定社团管理员相关的社团列表");
-
         List<Teams> list = teamsService.getListByManId(idDto.getId());
-
         return R.successData(list);
     }
 
@@ -88,21 +84,15 @@ public class TeamsController {
     @ResponseBody
     @ApiOperation("分页获取社团信息")
     public R getPageInfos(@RequestBody TeamsPageDto teamsPageDto) {
-
         Users user = usersService.getOne(cacheHandle.getUserInfoCache(teamsPageDto.getToken()));
-
         if (user.getType() == 1) {
-
-            teamsPageDto.getTeams().setManager(user.getId());
+            teamsPageDto.setManager(user.getId());
         }
-
         Log.info("分页查找社团信息，当前页码：{}，"
-                        + "每页数据量：{}, 模糊查询，附加参数：{}", teamsPageDto.getPageIndex(),
-                teamsPageDto.getPageSize(), teamsPageDto.getTeams());
-
+                        + "每页数据量：{}, 模糊查询，附加参数：{},{},{}", teamsPageDto.getPageIndex(),
+                teamsPageDto.getPageSize(), teamsPageDto.getName(),teamsPageDto.getTypeId(),teamsPageDto.getManager());
         PageData page = teamsService.getPageInfo(teamsPageDto.getPageIndex(),
-                teamsPageDto.getPageSize(), teamsPageDto.getTeams());
-
+                teamsPageDto.getPageSize(), teamsPageDto.getName(),teamsPageDto.getTypeId(),teamsPageDto.getManager());
         return R.successData(page);
     }
 

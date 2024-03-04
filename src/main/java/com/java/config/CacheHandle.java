@@ -22,10 +22,7 @@ public class CacheHandle {
      * @return
      */
     public Cache getUserCache(){
-
-        Cache cache = cacheManager.getCache(USER_KEY);
-
-        return  cache;
+        return cacheManager.getCache(USER_KEY);
     }
 
     /**
@@ -34,9 +31,7 @@ public class CacheHandle {
      * @param val 登录用户 信息
      */
     public void addUserCache(String key, Object val) {
-
         Cache cache = getUserCache();
-
         cache.put(key, val);
     }
 
@@ -45,9 +40,7 @@ public class CacheHandle {
      * @param key 缓存用户 token
      */
     public void removeUserCache(String key){
-
         Cache cache = getUserCache();
-
         cache.evict(key);
     }
 
@@ -57,11 +50,7 @@ public class CacheHandle {
      * @return
      */
     public String getUserInfoCache(String key){
-
         Cache cache = getUserCache();
-
-        String userId = cache.get(key, String.class);
-
-        return userId;
+        return cache.get(key, String.class);
     }
 }

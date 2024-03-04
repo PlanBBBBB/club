@@ -42,7 +42,6 @@ public class ActivitiesController {
     @PostMapping("")
     @ApiOperation("活动信息首页")
     public String index() {
-
         return "pages/Activities";
     }
 
@@ -50,11 +49,8 @@ public class ActivitiesController {
     @ResponseBody
     @ApiOperation("查找指定活动信息")
     public R getInfo(@RequestBody IdDto idDto) {
-
         Log.info("查找指定活动信息，ID：{}", idDto.getId());
-
         Activities activities = activitiesService.getOne(idDto.getId());
-
         return R.successData(activities);
     }
 
@@ -62,28 +58,20 @@ public class ActivitiesController {
     @ResponseBody
     @ApiOperation("分页查找活动信息")
     public R getPageInfos(@RequestBody ActivePageDto activePageDto) {
-
         Users user = usersService.getOne(cacheHandle.getUserInfoCache(activePageDto.getToken()));
-
         if (user.getType() == 0) {
-
             Log.info("分页查找活动信息，当前页码：{}，"
                             + "每页数据量：{}, 模糊查询，社团名称：{}，活动名称：{}", activePageDto.getPageIndex(),
                     activePageDto.getPageSize(), activePageDto.getTeamName(), activePageDto.getActiveName());
-
             PageData page = activitiesService.getPageAll(activePageDto.getPageIndex(),
                     activePageDto.getPageSize(), activePageDto.getTeamName(), activePageDto.getActiveName());
-
             return R.successData(page);
         } else {
-
             Log.info("分页查找活动信息，当前页码：{}，"
                             + "每页数据量：{}, 模糊查询，社团名称：{}，活动名称：{}", activePageDto.getPageIndex(),
                     activePageDto.getPageSize(), activePageDto.getTeamName(), activePageDto.getActiveName());
-
             PageData page = activitiesService.getPageByUserId(activePageDto.getPageIndex(),
                     activePageDto.getPageSize(), user.getId(), activePageDto.getTeamName(), activePageDto.getActiveName());
-
             return R.successData(page);
         }
     }
@@ -92,13 +80,9 @@ public class ActivitiesController {
     @ResponseBody
     @ApiOperation("添加活动信息")
     public R addInfo(@RequestBody Activities activities) {
-
         activities.setId(IDUtils.makeIDByCurrent());
-
         Log.info("添加活动信息，传入参数：{}", activities);
-
         activitiesService.add(activities);
-
         return R.success();
     }
 
@@ -106,11 +90,8 @@ public class ActivitiesController {
     @ResponseBody
     @ApiOperation("修改活动信息")
     public R updInfo(@RequestBody Activities activities) {
-
         Log.info("修改活动信息，传入参数：{}", activities);
-
         activitiesService.update(activities);
-
         return R.success();
     }
 
@@ -118,13 +99,9 @@ public class ActivitiesController {
     @ResponseBody
     @ApiOperation("删除活动信息")
     public R delInfo(@RequestBody IdDto idDto) {
-
         Log.info("删除活动信息, ID:{}", idDto.getId());
-
         Activities activities = activitiesService.getOne(idDto.getId());
-
         activitiesService.delete(activities);
-
         return R.success();
     }
 }

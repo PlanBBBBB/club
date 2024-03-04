@@ -9,7 +9,6 @@ import com.java.entity.Activities;
 import com.java.entity.Users;
 import com.java.service.ActiveLogsService;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 
@@ -34,63 +33,48 @@ public class ActiveLogsServiceImpl implements ActiveLogsService {
     @Override
     @Transactional
     public void add(ActiveLogs activeLogs) {
-
         Activities activitie = activitiesDao.selectById(activeLogs.getActiveId());
         activitie.setTotal(activitie.getTotal() + 1);
         activitiesDao.updateById(activitie);
-
         activeLogsDao.insert(activeLogs);
     }
 
     @Override
-    @Transactional
     public void update(ActiveLogs activeLogs) {
-
         activeLogsDao.updateById(activeLogs);
     }
 
     @Override
-    @Transactional
     public void delete(ActiveLogs activeLogs) {
-
         activeLogsDao.deleteById(activeLogs);
     }
 
     @Override
-    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public Boolean isActive(String activeId, String userId){
-
-        QueryWrapper<ActiveLogs> qw = new QueryWrapper<ActiveLogs>();
+        QueryWrapper<ActiveLogs> qw = new QueryWrapper<>();
         qw.eq("active_id", activeId);
         qw.eq("user_id", userId);
-
         return activeLogsDao.selectCount(qw) <= 0;
     }
 
     @Override
-    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public ActiveLogs getOne(String id) {
-
-        ActiveLogs activeLogs = activeLogsDao.selectById(id);
-
-        return activeLogs;
+        return activeLogsDao.selectById(id);
     }
 
     @Override
-    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public List<Map<String, Object>> getListByActiveId(String activeId){
 
-        List<Map<String, Object>> resl = new ArrayList<Map<String, Object>>();
+        List<Map<String, Object>> resl = new ArrayList<>();
 
-        QueryWrapper<ActiveLogs> qw = new QueryWrapper<ActiveLogs>();
+        QueryWrapper<ActiveLogs> qw = new QueryWrapper<>();
         qw.eq("active_id", activeId);
         qw.orderByDesc("create_time");
 
         List<ActiveLogs> activeLogs = activeLogsDao.selectList(qw);
 
         for (ActiveLogs activeLog : activeLogs) {
-
-            Map<String, Object> temp = new HashMap<String, Object>();
+            Map<String, Object> temp = new HashMap<>();
             temp.put("id", activeLog.getId());
             temp.put("createTime", activeLog.getCreateTime());
             temp.put("activeId", activeLog.getActiveId());
@@ -100,10 +84,8 @@ public class ActiveLogsServiceImpl implements ActiveLogsService {
             temp.put("userName", user.getName());
             temp.put("userGender", user.getGender());
             temp.put("userPhone", user.getPhone());
-
             resl.add(temp);
         }
-
         return resl;
     }
 }

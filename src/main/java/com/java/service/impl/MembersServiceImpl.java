@@ -7,7 +7,6 @@ import com.java.entity.*;
 import com.java.service.MembersService;
 import com.java.vo.PageData;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
@@ -32,16 +31,12 @@ public class MembersServiceImpl implements MembersService {
     private ApplyLogsDao applyLogsDao;
 
     @Override
-    @Transactional
     public void add(Members members) {
-
         membersDao.insert(members);
     }
 
     @Override
-    @Transactional
     public void update(Members members) {
-
         membersDao.updateById(members);
     }
 
@@ -49,15 +44,15 @@ public class MembersServiceImpl implements MembersService {
     @Transactional
     public void delete(Members members) {
 
-        QueryWrapper<PayLogs> qw_pay = new QueryWrapper<PayLogs>();
+        QueryWrapper<PayLogs> qw_pay = new QueryWrapper<>();
         qw_pay.eq("user_id", members.getUserId());
         payLogsDao.delete(qw_pay);
 
-        QueryWrapper<ActiveLogs> qw_active = new QueryWrapper<ActiveLogs>();
+        QueryWrapper<ActiveLogs> qw_active = new QueryWrapper<>();
         qw_active.eq("user_id", members.getUserId());
         activeLogsDao.delete(qw_active);
 
-        QueryWrapper<ApplyLogs> qw_apply = new QueryWrapper<ApplyLogs>();
+        QueryWrapper<ApplyLogs> qw_apply = new QueryWrapper<>();
         qw_apply.eq("user_id", members.getUserId());
         applyLogsDao.delete(qw_apply);
 
@@ -69,42 +64,29 @@ public class MembersServiceImpl implements MembersService {
     }
 
     @Override
-    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public Members getOne(String id) {
-
-        Members members = membersDao.selectById(id);
-
-        return members;
+        return membersDao.selectById(id);
     }
 
     @Override
-    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public Boolean isManager(String teamId, String userId){
-
-        QueryWrapper<Teams> qw = new QueryWrapper<Teams>();
+        QueryWrapper<Teams> qw = new QueryWrapper<>();
         qw.eq("manager", userId);
         qw.eq("id", teamId);
-
         return teamsDao.selectCount(qw) > 0;
     }
 
     @Override
-    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public PageData getPageAll(Long pageIndex, Long pageSize, String teamName, String userName) {
-
         Page<Map<String, Object>> page =
-                membersDao.qryPageAll(new Page<Map<String, Object>>(pageIndex, pageSize), teamName, userName);
-
+                membersDao.qryPageAll(new Page<>(pageIndex, pageSize), teamName, userName);
         return parsePage(page);
     }
 
     @Override
-    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public PageData getPageByManId(Long pageIndex, Long pageSize, String manId, String teamName, String userName) {
-
         Page<Map<String, Object>> page =
-                membersDao.qryPageByManId(new Page<Map<String, Object>>(pageIndex, pageSize), manId, teamName, userName);
-
+                membersDao.qryPageByManId(new Page<>(pageIndex, pageSize), manId, teamName, userName);
         return parsePage(page);
     }
 
@@ -112,9 +94,6 @@ public class MembersServiceImpl implements MembersService {
      * 转化分页查询的结果
      */
     public PageData parsePage(Page<Map<String, Object>> p) {
-
-        PageData pageData = new PageData(p.getCurrent(), p.getSize(), p.getTotal(), p.getRecords());
-
-        return pageData;
+        return new PageData(p.getCurrent(), p.getSize(), p.getTotal(), p.getRecords());
     }
 }

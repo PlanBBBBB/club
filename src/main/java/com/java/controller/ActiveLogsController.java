@@ -43,7 +43,6 @@ public class ActiveLogsController {
     @PostMapping("")
     @ApiOperation(value = "报名记录页面")
     public String index() {
-
         return "pages/ActiveLogs";
     }
 
@@ -51,11 +50,8 @@ public class ActiveLogsController {
     @ResponseBody
     @ApiOperation(value = "获取指定报名记录")
     public R getInfo(@RequestBody IdDto idDto) {
-
         Log.info("查找指定报名记录，ID：{}", idDto.getId());
-
         ActiveLogs activeLogs = activeLogsService.getOne(idDto.getId());
-
         return R.successData(activeLogs);
     }
 
@@ -63,11 +59,8 @@ public class ActiveLogsController {
     @ResponseBody
     @ApiOperation(value = "获取指定活动的报名记录")
     public R getList(@RequestBody IdDto idDto) {
-
         Log.info("获取指定活动的报名记录，活动ID：{}", idDto.getId());
-
         List<Map<String, Object>> list = activeLogsService.getListByActiveId(idDto.getId());
-
         return R.successData(list);
     }
 
@@ -75,22 +68,15 @@ public class ActiveLogsController {
     @ResponseBody
     @ApiOperation(value = "添加报名记录")
     public R addInfo(@RequestBody AddActivelogsDto addActivelogsDto) {
-
         Users user = usersService.getOne(cacheHandle.getUserInfoCache(addActivelogsDto.getToken()));
-
         if (activeLogsService.isActive(addActivelogsDto.getActiveId(), user.getId())) {
-
             addActivelogsDto.setId(IDUtils.makeIDByCurrent());
             addActivelogsDto.setUserId(user.getId());
             addActivelogsDto.setCreateTime(DateUtils.getNowDate());
-
             Log.info("添加报名记录，传入参数：{}", addActivelogsDto);
-
             activeLogsService.add(addActivelogsDto);
-
             return R.success();
         } else {
-
             return R.warn("该活动您已参与，请勿重复报名");
         }
     }
@@ -99,11 +85,8 @@ public class ActiveLogsController {
     @ResponseBody
     @ApiOperation(value = "修改报名记录")
     public R updInfo(@RequestBody ActiveLogs activeLogs) {
-
         Log.info("修改报名记录，传入参数：{}", activeLogs);
-
         activeLogsService.update(activeLogs);
-
         return R.success();
     }
 
@@ -111,13 +94,9 @@ public class ActiveLogsController {
     @ResponseBody
     @ApiOperation(value = "删除报名记录")
     public R delInfo(@RequestBody IdDto idDto) {
-
         Log.info("删除报名记录, ID:{}", idDto.getId());
-
         ActiveLogs activeLogs = activeLogsService.getOne(idDto.getId());
-
         activeLogsService.delete(activeLogs);
-
         return R.success();
     }
 }

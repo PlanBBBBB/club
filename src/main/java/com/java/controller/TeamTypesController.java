@@ -34,7 +34,6 @@ public class TeamTypesController {
     @PostMapping("")
     @ApiOperation("社团类型页面")
     public String index() {
-
         return "pages/TeamTypes";
     }
 
@@ -42,11 +41,8 @@ public class TeamTypesController {
     @ResponseBody
     @ApiOperation("查看全部的社团类型信息")
     public R getAll() {
-
         Log.info("查看全部的社团类型信息");
-
         List<TeamTypes> list = teamTypesService.getAll();
-
         return R.successData(list);
     }
 
@@ -54,11 +50,8 @@ public class TeamTypesController {
     @ResponseBody
     @ApiOperation("查找指定社团类型")
     public R getInfo(@RequestBody IdDto idDto) {
-
         Log.info("查找指定社团类型，ID：{}", idDto.getId());
-
         TeamTypes teamTypes = teamTypesService.getOne(idDto.getId());
-
         return R.successData(teamTypes);
     }
 
@@ -66,14 +59,11 @@ public class TeamTypesController {
     @ResponseBody
     @ApiOperation("分页查找社团类型")
     public R getPageInfos(@RequestBody TeamTypesPageDto teamTypesPageDto) {
-
         Log.info("分页查找社团类型，当前页码：{}，"
                         + "每页数据量：{}, 模糊查询，附加参数：{}", teamTypesPageDto.getPageIndex(),
-                teamTypesPageDto.getPageSize(), teamTypesPageDto.getTeamTypes());
-
+                teamTypesPageDto.getPageSize(), teamTypesPageDto.getName());
         PageData page = teamTypesService.getPageInfo(teamTypesPageDto.getPageIndex(),
-                teamTypesPageDto.getPageSize(), teamTypesPageDto.getTeamTypes());
-
+                teamTypesPageDto.getPageSize(), teamTypesPageDto.getName());
         return R.successData(page);
     }
 
@@ -81,14 +71,10 @@ public class TeamTypesController {
     @ResponseBody
     @ApiOperation("添加社团类型")
     public R addInfo(@RequestBody TeamTypes teamTypes) {
-
         teamTypes.setId(IDUtils.makeIDByCurrent());
         teamTypes.setCreateTime(DateUtils.getNowDate());
-
         Log.info("添加社团类型，传入参数：{}", teamTypes);
-
         teamTypesService.add(teamTypes);
-
         return R.success();
     }
 
@@ -96,11 +82,8 @@ public class TeamTypesController {
     @ResponseBody
     @ApiOperation("修改社团类型")
     public R updInfo(@RequestBody TeamTypes teamTypes) {
-
         Log.info("修改社团类型，传入参数：{}", teamTypes);
-
         teamTypesService.update(teamTypes);
-
         return R.success();
     }
 
@@ -108,18 +91,12 @@ public class TeamTypesController {
     @ResponseBody
     @ApiOperation("删除社团类型")
     public R delInfo(@RequestBody IdDto idDto) {
-
         if (teamTypesService.isRemove(idDto.getId())) {
-
             Log.info("删除社团类型, ID:{}", idDto.getId());
-
             TeamTypes teamTypes = teamTypesService.getOne(idDto.getId());
-
             teamTypesService.delete(teamTypes);
-
             return R.success();
         } else {
-
             return R.warn("存在关联社团，无法移除");
         }
     }

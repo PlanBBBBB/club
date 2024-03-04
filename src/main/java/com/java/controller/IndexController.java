@@ -39,23 +39,15 @@ public class IndexController {
     @ResponseBody
     @ApiOperation("获取系统通知")
     public R getNoticeList(@RequestBody TokenDto tokenDto) {
-
         Users user = usersService.getOne(cacheHandle.getUserInfoCache(tokenDto.getToken()));
-
         if (user.getType() == 0) {
-
             List<Notices> list = noticesService.getSysNotices();
-
             return R.successData(list);
         } else if (user.getType() == 1) {
-
             List<Notices> list = noticesService.getManNotices(user.getId());
-
             return R.successData(list);
         } else {
-
             List<Notices> list = noticesService.getMemNotices(user.getId());
-
             return R.successData(list);
         }
     }
@@ -64,25 +56,16 @@ public class IndexController {
     @ResponseBody
     @ApiOperation("用户登录")
     public R login(@RequestBody LoginDto loginDto) {
-
         Log.info("用户登录，用户名：{}， 用户密码：{}", loginDto.getUserName(), loginDto.getPassWord());
-
         Users user = usersService.getUserByUserName(loginDto.getUserName());
-
         if (user == null) {
-
             return R.error("输入的用户名不存在");
         } else {
-
             if (loginDto.getPassWord().equals(user.getPassWord().trim())) {
-
-
                 String token = IDUtils.makeIDByUUID();
                 cacheHandle.addUserCache(token, user.getId());
-
                 return R.success("登录成功", token);
             } else {
-
                 return R.error("输入的密码错误");
             }
         }
@@ -92,11 +75,8 @@ public class IndexController {
     @ResponseBody
     @ApiOperation("用户退出")
     public R exit(@RequestBody TokenDto tokenDto) {
-
         Log.info("用户退出系统并移除登录信息");
-
         cacheHandle.removeUserCache(tokenDto.getToken());
-
         return R.success();
     }
 
@@ -104,9 +84,7 @@ public class IndexController {
     @ResponseBody
     @ApiOperation("获取用户信息")
     public R info(@RequestBody TokenDto tokenDto) {
-
         Users user = usersService.getOne(cacheHandle.getUserInfoCache(tokenDto.getToken()));
-
         return R.successData(user);
     }
 
@@ -114,11 +92,8 @@ public class IndexController {
     @ResponseBody
     @ApiOperation("修改用户信息")
     public R info(@RequestBody Users user) {
-
         Log.info("修改用户信息，{}", user);
-
         usersService.update(user);
-
         return R.success();
     }
 
@@ -126,14 +101,10 @@ public class IndexController {
     @ResponseBody
     @ApiOperation("验证原始密码")
     public R checkPwd(@RequestBody PwdDto pwdDto) {
-
         Users user = usersService.getOne(cacheHandle.getUserInfoCache(pwdDto.getToken()));
-
         if (pwdDto.getPassword().equals(user.getPassWord())) {
-
             return R.success();
         } else {
-
             return R.warn("原始密码和输入密码不一致");
         }
     }
@@ -142,14 +113,10 @@ public class IndexController {
     @ResponseBody
     @ApiOperation("修改用户密码")
     public R pwd(@RequestBody PwdDto pwdDto) {
-
         Log.info("修改用户密码，{}", pwdDto.getPassword());
-
         Users user = usersService.getOne(cacheHandle.getUserInfoCache(pwdDto.getToken()));
-
         user.setPassWord(pwdDto.getPassword());
         usersService.update(user);
-
         return R.success();
     }
 }

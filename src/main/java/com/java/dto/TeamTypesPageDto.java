@@ -1,6 +1,5 @@
 package com.java.dto;
 
-import com.java.entity.TeamTypes;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -10,6 +9,6 @@ import lombok.Data;
 public class TeamTypesPageDto  extends PageDto{
     @ApiModelProperty("token")
     String token;
-    @ApiModelProperty("社团类型")
-    TeamTypes teamTypes;
+    @ApiModelProperty("类型名称")
+    private String name;
 }

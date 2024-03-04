@@ -27,10 +27,8 @@ public interface TeamsService extends BaseService<Teams, String> {
 
 	/**
 	 * 分页查询社团信息信息
-	 * @param pageIndex 当前页码
-	 * @param pageSize 每页数据量
-	 * @param teams 模糊查询条件
 	 * @return
-	 */	
-	public PageData getPageInfo(Long pageIndex, Long pageSize, Teams teams);
+	 */
+	PageData getPageInfo(Long pageIndex, Long pageSize, String name, String typeId, String manager);
+
 }

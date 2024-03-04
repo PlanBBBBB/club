@@ -1,6 +1,5 @@
 package com.java.dto;
 
-import com.java.entity.Teams;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -10,6 +9,13 @@ import lombok.Data;
 public class TeamsPageDto extends PageDto {
     @ApiModelProperty("token")
     String token;
-    @ApiModelProperty("社团")
-    Teams teams;
+
+    @ApiModelProperty(value = "社团名称")
+    private String name;
+
+    @ApiModelProperty(value = "社团编号")
+    private String typeId;
+
+    @ApiModelProperty(value = "社团团长")
+    private String manager;
 }

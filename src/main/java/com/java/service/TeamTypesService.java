@@ -30,8 +30,8 @@ public interface TeamTypesService extends BaseService<TeamTypes, String> {
 	 * 分页查询社团类型信息
 	 * @param pageIndex 当前页码
 	 * @param pageSize 每页数据量
-	 * @param teamTypes 模糊查询条件
+	 * @param name 模糊查询条件
 	 * @return
 	 */	
-	public PageData getPageInfo(Long pageIndex, Long pageSize, TeamTypes teamTypes);
+	public PageData getPageInfo(Long pageIndex, Long pageSize,String name);
 }

@@ -1,5 +1,6 @@
 package com.java.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.java.dao.*;
@@ -10,7 +11,6 @@ import com.java.utils.IDUtils;
 import com.java.utils.StringUtils;
 import com.java.vo.PageData;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
@@ -79,27 +79,27 @@ public class TeamsServiceImpl implements TeamsService {
     @Transactional
     public void delete(Teams teams) {
 
-        QueryWrapper<Notices> qw_notice = new QueryWrapper<Notices>();
+        QueryWrapper<Notices> qw_notice = new QueryWrapper<>();
         qw_notice.eq("team_id", teams.getId());
         noticesDao.delete(qw_notice);
 
-        QueryWrapper<PayLogs> qw_pay = new QueryWrapper<PayLogs>();
+        QueryWrapper<PayLogs> qw_pay = new QueryWrapper<>();
         qw_pay.eq("team_id", teams.getId());
         payLogsDao.delete(qw_pay);
 
-        QueryWrapper<ApplyLogs> qw_apply = new QueryWrapper<ApplyLogs>();
+        QueryWrapper<ApplyLogs> qw_apply = new QueryWrapper<>();
         qw_apply.eq("team_id", teams.getId());
         applyLogsDao.delete(qw_apply);
 
-        QueryWrapper<Members> qw_members = new QueryWrapper<Members>();
+        QueryWrapper<Members> qw_members = new QueryWrapper<>();
         qw_members.eq("team_id", teams.getId());
         membersDao.delete(qw_members);
 
-        QueryWrapper<Activities> qw_active = new QueryWrapper<Activities>();
+        QueryWrapper<Activities> qw_active = new QueryWrapper<>();
         qw_active.eq("team_id", teams.getId());
-        for(Activities activitie : activitiesDao.selectList(qw_active)){
+        for (Activities activitie : activitiesDao.selectList(qw_active)) {
 
-            QueryWrapper<ActiveLogs> qw_active_log = new QueryWrapper<ActiveLogs>();
+            QueryWrapper<ActiveLogs> qw_active_log = new QueryWrapper<>();
             qw_active_log.eq("active_id", activitie.getId());
             activeLogsDao.delete(qw_active_log);
         }
@@ -107,9 +107,9 @@ public class TeamsServiceImpl implements TeamsService {
 
         teamsDao.deleteById(teams);
 
-        QueryWrapper<Teams> qw_team = new QueryWrapper<Teams>();
+        QueryWrapper<Teams> qw_team = new QueryWrapper<>();
         qw_team.eq("manager", teams.getManager());
-        if(teamsDao.selectCount(qw_team) <= 0){
+        if (teamsDao.selectCount(qw_team) <= 0) {
 
             Users user = usersDao.selectById(teams.getManager());
             user.setType(2);
@@ -118,66 +118,32 @@ public class TeamsServiceImpl implements TeamsService {
     }
 
     @Override
-    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public Teams getOne(String id) {
-
-        Teams teams = teamsDao.selectById(id);
-
-        return teams;
+        return teamsDao.selectById(id);
     }
 
     @Override
-    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-    public List<Teams> getAll(){
-
-        QueryWrapper<Teams> qw = new QueryWrapper<Teams>();
-
-        qw.orderByDesc("create_time");
-
-        List<Teams> list = teamsDao.selectList(qw);
-
-        return list;
+    public List<Teams> getAll() {
+        LambdaQueryWrapper<Teams> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.orderByDesc(Teams::getCreateTime);
+        return teamsDao.selectList(queryWrapper);
     }
 
     @Override
-    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-    public List<Teams> getListByManId(String manId){
-
-        QueryWrapper<Teams> qw = new QueryWrapper<Teams>();
-        qw.eq("manager", manId);
-        qw.orderByDesc("create_time");
-
-        List<Teams> list = teamsDao.selectList(qw);
-
-        return list;
+    public List<Teams> getListByManId(String manId) {
+        LambdaQueryWrapper<Teams> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Teams::getManager,manId).orderByDesc(Teams::getCreateTime);
+        return teamsDao.selectList(queryWrapper);
     }
 
     @Override
-    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-    public PageData getPageInfo(Long pageIndex, Long pageSize, Teams teams) {
-
-        QueryWrapper<Teams> qw = new QueryWrapper<Teams>();
-
-        if(StringUtils.isNotNullOrEmpty(teams.getName())){
-
-            qw.like("name", teams.getName());
-        }
-
-        if(StringUtils.isNotNullOrEmpty(teams.getTypeId())){
-
-            qw.eq("type_id", teams.getTypeId());
-        }
-
-        if(StringUtils.isNotNullOrEmpty(teams.getManager())){
-
-            qw.eq("manager", teams.getManager());
-        }
-
-        qw.orderByDesc("create_time");
-
-        Page<Teams> page =
-                teamsDao.selectPage(new Page<Teams>(pageIndex, pageSize), qw);
-
+    public PageData getPageInfo(Long pageIndex, Long pageSize, String name, String typeId, String manager) {
+        LambdaQueryWrapper<Teams> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.like(StringUtils.isNotNullOrEmpty(name), Teams::getName, name)
+                .eq(StringUtils.isNotNullOrEmpty(typeId), Teams::getTypeId, typeId)
+                .eq(StringUtils.isNotNullOrEmpty(manager), Teams::getManager, manager)
+                .orderByDesc(Teams::getCreateTime);
+        Page<Teams> page = teamsDao.selectPage(new Page<>(pageIndex, pageSize), queryWrapper);
         return parsePage(page);
     }
 
@@ -186,11 +152,11 @@ public class TeamsServiceImpl implements TeamsService {
      */
     public PageData parsePage(Page<Teams> p) {
 
-        List<Map<String, Object>> resl = new ArrayList<Map<String, Object>>();
+        List<Map<String, Object>> resl = new ArrayList<>();
 
         for (Teams teams : p.getRecords()) {
 
-            Map<String, Object> temp = new HashMap<String, Object>();
+            Map<String, Object> temp = new HashMap<>();
             temp.put("id", teams.getId());
             temp.put("name", teams.getName());
             temp.put("createTime", teams.getCreateTime());
@@ -208,8 +174,6 @@ public class TeamsServiceImpl implements TeamsService {
             resl.add(temp);
         }
 
-        PageData pageData = new PageData(p.getCurrent(), p.getSize(), p.getTotal(), resl);
-
-        return pageData;
+        return new PageData(p.getCurrent(), p.getSize(), p.getTotal(), resl);
     }
 }

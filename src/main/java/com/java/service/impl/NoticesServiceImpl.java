@@ -9,8 +9,6 @@ import com.java.service.NoticesService;
 import com.java.utils.StringUtils;
 import com.java.vo.PageData;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -28,113 +26,75 @@ public class NoticesServiceImpl implements NoticesService {
 	private TeamsDao teamsDao;
 
     @Override
-    @Transactional
     public void add(Notices notices) {
-
         noticesDao.insert(notices);
     }
 
     @Override
-    @Transactional
     public void update(Notices notices) {
-
         noticesDao.updateById(notices);
     }
 
     @Override
-    @Transactional
     public void delete(Notices notices) {
-
         noticesDao.deleteById(notices);
     }
 
     @Override
-    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public Notices getOne(String id) {
-
-        Notices notices = noticesDao.selectById(id);
-
-        return notices;
+        return noticesDao.selectById(id);
     }
 
     @Override
-    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public List<Notices> getSysNotices(){
-
-        List<Notices> list = noticesDao.qrySysNotices();
-
-        return list;
+        return noticesDao.qrySysNotices();
     }
 
     @Override
-    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public List<Notices> getManNotices(String manId){
-
-        List<Notices> list = noticesDao.qryManNotices(manId);
-
-        return list;
+        return noticesDao.qryManNotices(manId);
     }
 
     @Override
-    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public List<Notices> getMemNotices(String memId){
-
-        List<Notices> list = noticesDao.qryMemNotices(memId);
-
-        return list;
+        return noticesDao.qryMemNotices(memId);
     }
 
     @Override
-    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public PageData getPageAll(Long pageIndex, Long pageSize, String title, String teamName){
-
         Page<Map<String, Object>>  page =
-                noticesDao.qryPageAll(new Page<Map<String, Object>>(pageIndex, pageSize), title, teamName);
-
+                noticesDao.qryPageAll(new Page<>(pageIndex, pageSize), title, teamName);
         return parsePage(page);
     }
 
     @Override
-    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public PageData getPageById(Long pageIndex, Long pageSize, String userId, String title, String teamName){
-
         Page<Map<String, Object>>  page =
-                noticesDao.qryPageById(new Page<Map<String, Object>>(pageIndex, pageSize), userId, title, teamName);
-
+                noticesDao.qryPageById(new Page<>(pageIndex, pageSize), userId, title, teamName);
         return parsePage(page);
     }
 
     /**
      * 查询列表结果转换
-     * @param notices
-     * @return
      */
     public List<Map<String, Object>> parseList(List<Notices> notices){
-
-        List<Map<String, Object>> resl = new ArrayList<Map<String, Object>>();
-
+        List<Map<String, Object>> resl = new ArrayList<>();
         for (Notices notice : notices) {
-
-            Map<String, Object> temp = new HashMap<String, Object>();
+            Map<String, Object> temp = new HashMap<>();
             temp.put("id", notice.getId());
             temp.put("title", notice.getTitle());
             temp.put("detail", notice.getDetail());
             temp.put("createTime", notice.getCreateTime());
-
             if(StringUtils.isNotNullOrEmpty(notice.getTeamId())){
-
                 Teams teams = teamsDao.selectById(notice.getTeamId());
                 temp.put("teamId", notice.getTeamId());
                 temp.put("teamName", teams.getName());
                 temp.put("isTeam", true);
             }else{
-
                 temp.put("isTeam", false);
             }
-
             resl.add(temp);
         }
-
         return resl;
     }
 
@@ -142,9 +102,6 @@ public class NoticesServiceImpl implements NoticesService {
      * 转化分页查询的结果
      */
     public PageData parsePage(Page<Map<String, Object>> p) {
-
-        PageData pageData = new PageData(p.getCurrent(), p.getSize(), p.getTotal(), p.getRecords());
-
-        return pageData;
+        return new PageData(p.getCurrent(), p.getSize(), p.getTotal(), p.getRecords());
     }
 }

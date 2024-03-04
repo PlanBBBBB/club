@@ -1,6 +1,6 @@
 package com.java.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.java.dao.ActiveLogsDao;
 import com.java.dao.StyleDao;
@@ -45,7 +45,6 @@ public class StyleServiceImpl implements StyleService {
     }
 
     @Override
-    @Transactional
     public void update(Style style) {
         styleDao.updateById(style);
     }
@@ -53,14 +52,13 @@ public class StyleServiceImpl implements StyleService {
     @Override
     @Transactional
     public void delete(Style style) {
-        QueryWrapper<ActiveLogs> qw = new QueryWrapper<ActiveLogs>();
-        qw.eq("active_id", style.getId());
-        activeLogsDao.delete(qw);
+        LambdaQueryWrapper<ActiveLogs> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(ActiveLogs::getActiveId, style.getId());
+        activeLogsDao.delete(queryWrapper);
         styleDao.deleteById(style);
     }
 
     @Override
-    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public Style getOne(String id) {
         return styleDao.selectById(id);
     }
@@ -69,7 +67,7 @@ public class StyleServiceImpl implements StyleService {
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public PageData getPageAll(Long pageIndex, Long pageSize, String activeName, String teamName) {
         Page<Map<String, Object>> page =
-                styleDao.qryPageAll(new Page<Map<String, Object>>(pageIndex, pageSize), activeName, teamName);
+                styleDao.qryPageAll(new Page<>(pageIndex, pageSize), activeName, teamName);
         return parsePage(page);
     }
 
@@ -77,7 +75,7 @@ public class StyleServiceImpl implements StyleService {
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public PageData getPageByUserId(Long pageIndex, Long pageSize, String userId, String activeName, String teamName) {
         Page<Map<String, Object>> page =
-                styleDao.qryPageByMemId(new Page<Map<String, Object>>(pageIndex, pageSize), userId, activeName, teamName);
+                styleDao.qryPageByMemId(new Page<>(pageIndex, pageSize), userId, activeName, teamName);
         return parsePage(page);
     }
 

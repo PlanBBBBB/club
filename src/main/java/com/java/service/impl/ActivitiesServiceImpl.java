@@ -13,7 +13,6 @@ import com.java.utils.DateUtils;
 import com.java.utils.IDUtils;
 import com.java.vo.PageData;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
@@ -34,11 +33,8 @@ public class ActivitiesServiceImpl implements ActivitiesService {
     @Override
     @Transactional
     public void add(Activities activities) {
-
         activitiesDao.insert(activities);
-
         Teams teams = teamsDao.selectById(activities.getTeamId());
-
         ActiveLogs activeLog = new ActiveLogs();
         activeLog.setId(IDUtils.makeIDByCurrent());
         activeLog.setActiveId(activities.getId());
@@ -48,49 +44,33 @@ public class ActivitiesServiceImpl implements ActivitiesService {
     }
 
     @Override
-    @Transactional
     public void update(Activities activities) {
-
         activitiesDao.updateById(activities);
     }
 
     @Override
     @Transactional
     public void delete(Activities activities) {
-
-        QueryWrapper<ActiveLogs> qw = new QueryWrapper<ActiveLogs>();
+        QueryWrapper<ActiveLogs> qw = new QueryWrapper<>();
         qw.eq("active_id", activities.getId());
         activeLogsDao.delete(qw);
-
         activitiesDao.deleteById(activities);
     }
 
     @Override
-    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public Activities getOne(String id) {
-
-        Activities activities = activitiesDao.selectById(id);
-
-        return activities;
+        return activitiesDao.selectById(id);
     }
 
     @Override
-    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public PageData getPageAll(Long pageIndex, Long pageSize, String activeName, String teamName) {
-
-        Page<Map<String, Object>> page =
-                activitiesDao.qryPageAll(new Page<Map<String, Object>>(pageIndex, pageSize), activeName, teamName);
-
+        Page<Map<String, Object>> page = activitiesDao.qryPageAll(new Page<>(pageIndex, pageSize), activeName, teamName);
         return parsePage(page);
     }
 
     @Override
-    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public PageData getPageByUserId(Long pageIndex, Long pageSize, String userId, String activeName, String teamName) {
-
-        Page<Map<String, Object>> page =
-                activitiesDao.qryPageByMemId(new Page<Map<String, Object>>(pageIndex, pageSize), userId, activeName, teamName);
-
+        Page<Map<String, Object>> page = activitiesDao.qryPageByMemId(new Page<>(pageIndex, pageSize), userId, activeName, teamName);
         return parsePage(page);
     }
 
@@ -98,9 +78,6 @@ public class ActivitiesServiceImpl implements ActivitiesService {
      * 转化分页查询的结果
      */
     public PageData parsePage(Page<Map<String, Object>> p) {
-
-        PageData pageData = new PageData(p.getCurrent(), p.getSize(), p.getTotal(), p.getRecords());
-
-        return pageData;
+        return new PageData(p.getCurrent(), p.getSize(), p.getTotal(), p.getRecords());
     }
 }
