@@ -3,13 +3,17 @@ package com.java.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.java.dao.*;
+import com.java.dto.MemberAddDto;
 import com.java.entity.*;
 import com.java.service.MembersService;
+import com.java.utils.IDUtils;
 import com.java.vo.PageData;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 @Service("membersService")
@@ -31,9 +35,14 @@ public class MembersServiceImpl implements MembersService {
     private ApplyLogsDao applyLogsDao;
 
     @Override
-    public void add(Members members) {
+    public void add(MemberAddDto memberAddDto) {
+        Members members = new Members();
+        BeanUtils.copyProperties(memberAddDto,members);
+        members.setCreateTime(LocalDateTime.now().toString());
+        members.setId(IDUtils.makeIDByUUID());
         membersDao.insert(members);
     }
+
 
     @Override
     public void update(Members members) {

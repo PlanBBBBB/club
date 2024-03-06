@@ -3,11 +3,11 @@ package com.java.controller;
 import com.java.config.CacheHandle;
 import com.java.dto.ApplylogsOrUserPageDto;
 import com.java.dto.IdDto;
+import com.java.dto.MemberAddDto;
 import com.java.entity.Members;
 import com.java.entity.Users;
 import com.java.service.MembersService;
 import com.java.service.UsersService;
-import com.java.utils.IDUtils;
 import com.java.vo.PageData;
 import com.java.vo.R;
 import io.swagger.annotations.Api;
@@ -79,10 +79,8 @@ public class MembersController {
     @PostMapping("/add")
     @ResponseBody
     @ApiOperation("添加成员信息")
-    public R addInfo(@RequestBody Members members) {
-        members.setId(IDUtils.makeIDByCurrent());
-        Log.info("添加成员信息，传入参数：{}", members);
-        membersService.add(members);
+    public R addInfo(@RequestBody MemberAddDto memberAddDto) {
+        membersService.add(memberAddDto);
         return R.success();
     }
 
@@ -90,7 +88,6 @@ public class MembersController {
     @ResponseBody
     @ApiOperation("修改成员信息")
     public R updInfo(@RequestBody Members members) {
-        Log.info("修改成员信息，传入参数：{}", members);
         membersService.update(members);
         return R.success();
     }
