@@ -11,7 +11,7 @@
  Target Server Version : 80100 (8.1.0)
  File Encoding         : 65001
 
- Date: 03/03/2024 20:30:46
+ Date: 06/03/2024 10:09:07
 */
 
 SET NAMES utf8mb4;
@@ -108,9 +108,9 @@ CREATE TABLE `comments`  (
 DROP TABLE IF EXISTS `members`;
 CREATE TABLE `members`  (
   `id` char(13) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL COMMENT '记录ID',
-  `create_time` char(19) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL COMMENT '入团时间',
   `team_id` char(13) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL COMMENT '加入社团',
   `user_id` char(13) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL COMMENT '申请用户',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '入团时间',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `team_id`(`team_id` ASC) USING BTREE,
   INDEX `user_id`(`user_id` ASC) USING BTREE,
@@ -121,10 +121,11 @@ CREATE TABLE `members`  (
 -- ----------------------------
 -- Records of members
 -- ----------------------------
-INSERT INTO `members` VALUES ('1642422100000', '2022-01-17 20:00:00', '1642422100000', '1642422100001');
-INSERT INTO `members` VALUES ('1672148926606', '2022-12-27 21:48:46', '1672148926602', '1672148602348');
-INSERT INTO `members` VALUES ('1672148941775', '2022-12-27 21:49:01', '1642422100000', '1672148602348');
-INSERT INTO `members` VALUES ('1679549239565', '2023-03-23 13:27:19', '1672148926602', '1679549174356');
+INSERT INTO `members` VALUES ('1642422100000', '1642422100000', '1642422100001', '2024-03-06 10:03:59');
+INSERT INTO `members` VALUES ('1672148926606', '1672148926602', '1672148602348', '2024-03-06 10:03:59');
+INSERT INTO `members` VALUES ('1672148941775', '1642422100000', '1672148602348', '2024-03-06 10:03:59');
+INSERT INTO `members` VALUES ('1679549239565', '1672148926602', '1679549174356', '2024-03-06 10:03:59');
+INSERT INTO `members` VALUES ('1709690742210', '1672148926602', '1642422100001', '2023-12-19 10:05:18');
 
 -- ----------------------------
 -- Table structure for notices
