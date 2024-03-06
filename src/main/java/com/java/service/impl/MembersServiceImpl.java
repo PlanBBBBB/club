@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.time.LocalDateTime;
 import java.util.Map;
 
 @Service("membersService")
@@ -38,8 +37,7 @@ public class MembersServiceImpl implements MembersService {
     public void add(MemberAddDto memberAddDto) {
         Members members = new Members();
         BeanUtils.copyProperties(memberAddDto,members);
-        members.setCreateTime(LocalDateTime.now().toString());
-        members.setId(IDUtils.makeIDByUUID());
+        members.setId(IDUtils.makeIDByCurrent());
         membersDao.insert(members);
     }
 
