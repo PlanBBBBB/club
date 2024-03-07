@@ -12,8 +12,7 @@ import com.java.vo.PageData;
 import com.java.vo.R;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,9 +24,8 @@ import javax.annotation.Resource;
 @Controller
 @RequestMapping("/style")
 @Api(tags = "风采信息")
+@Slf4j
 public class StyleController {
-
-    protected static final Logger Log = LoggerFactory.getLogger(ActivitiesController.class);
 
     @Resource
     private CacheHandle cacheHandle;
@@ -48,7 +46,7 @@ public class StyleController {
     @ResponseBody
     @ApiOperation("查找指定风采信息")
     public R getInfo(@RequestBody IdDto idDto) {
-        Log.info("查找指定风采信息，ID：{}", idDto.getId());
+        log.info("查找指定风采信息，ID：{}", idDto.getId());
         Style style = styleService.getOne(idDto.getId());
         return R.successData(style);
     }
@@ -59,14 +57,14 @@ public class StyleController {
     public R getPageInfos(@RequestBody ActivePageDto activePageDto) {
         Users user = usersService.getOne(cacheHandle.getUserInfoCache(activePageDto.getToken()));
         if (user.getType() == 0) {
-            Log.info("分页查找风采信息，当前页码：{}，"
+            log.info("分页查找风采信息，当前页码：{}，"
                             + "每页数据量：{}, 模糊查询，社团名称：{}，风采名称：{}", activePageDto.getPageIndex(),
                     activePageDto.getPageSize(), activePageDto.getTeamName(), activePageDto.getActiveName());
             PageData page = styleService.getPageAll(activePageDto.getPageIndex(),
                     activePageDto.getPageSize(), activePageDto.getTeamName(), activePageDto.getActiveName());
             return R.successData(page);
         } else {
-            Log.info("分页查找风采信息，当前页码：{}，"
+            log.info("分页查找风采信息，当前页码：{}，"
                             + "每页数据量：{}, 模糊查询，社团名称：{}，风采名称：{}", activePageDto.getPageIndex(),
                     activePageDto.getPageSize(), activePageDto.getTeamName(), activePageDto.getActiveName());
             PageData page = styleService.getPageByUserId(activePageDto.getPageIndex(),
@@ -80,7 +78,7 @@ public class StyleController {
     @ApiOperation("添加风采信息")
     public R addInfo(@RequestBody Style style) {
         style.setId(IDUtils.makeIDByCurrent());
-        Log.info("添加风采信息，传入参数：{}", style);
+        log.info("添加风采信息，传入参数：{}", style);
         styleService.add(style);
         return R.success();
     }
@@ -89,7 +87,7 @@ public class StyleController {
     @ResponseBody
     @ApiOperation("修改风采信息")
     public R updInfo(@RequestBody Style style) {
-        Log.info("修改风采信息，传入参数：{}", style);
+        log.info("修改风采信息，传入参数：{}", style);
         styleService.update(style);
         return R.success();
     }
@@ -98,7 +96,7 @@ public class StyleController {
     @ResponseBody
     @ApiOperation("删除风采信息")
     public R delInfo(@RequestBody IdDto idDto) {
-        Log.info("删除风采信息, ID:{}", idDto.getId());
+        log.info("删除风采信息, ID:{}", idDto.getId());
         Style style = styleService.getOne(idDto.getId());
         styleService.delete(style);
         return R.success();

@@ -1,37 +1,83 @@
 package com.java.service;
 
-
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.java.dao.TeamTypesDao;
+import com.java.dao.TeamsDao;
 import com.java.entity.TeamTypes;
+import com.java.entity.Teams;
+import com.java.utils.StringUtils;
 import com.java.vo.PageData;
+import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-/**
- * 业务层处理
- * 社团类型
- */
-public interface TeamTypesService extends BaseService<TeamTypes, String> {
+@Service("teamTypesService")
+public class TeamTypesService {
 
-	/**
-	 * 检查指定的社团类型是否可以删除
-	 * 如果存在关联社团不能删除
-	 * @param typeId 社团ID
-	 * @return
-	 */
-	public Boolean isRemove(String typeId);
+    @Resource
+    private TeamTypesDao teamTypesDao;
 
-	/**
-	 * 获取全部的社团类型信息
-	 * @return
-	 */
-	public List<TeamTypes> getAll();
+    @Resource
+    private TeamsDao teamsDao;
 
-	/**
-	 * 分页查询社团类型信息
-	 * @param pageIndex 当前页码
-	 * @param pageSize 每页数据量
-	 * @param name 模糊查询条件
-	 * @return
-	 */	
-	public PageData getPageInfo(Long pageIndex, Long pageSize,String name);
+    
+    public void add(TeamTypes teamTypes) {
+        teamTypesDao.insert(teamTypes);
+    }
+
+    
+    public void update(TeamTypes teamTypes) {
+        teamTypesDao.updateById(teamTypes);
+    }
+
+    
+    public void delete(TeamTypes teamTypes) {
+        teamTypesDao.deleteById(teamTypes);
+    }
+
+    
+    public Boolean isRemove(String typeId) {
+        LambdaQueryWrapper<Teams> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Teams::getTypeId, typeId);
+        return teamsDao.selectCount(queryWrapper) <= 0;
+    }
+
+    
+    public TeamTypes getOne(String id) {
+        return teamTypesDao.selectById(id);
+    }
+
+    
+    public List<TeamTypes> getAll() {
+        return teamTypesDao.selectList(null);
+    }
+
+    
+    public PageData getPageInfo(Long pageIndex, Long pageSize, String name) {
+        LambdaQueryWrapper<TeamTypes> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.like(StringUtils.isNotNullOrEmpty(name), TeamTypes::getName, name)
+                .orderByDesc(TeamTypes::getCreateTime);
+        Page<TeamTypes> page = teamTypesDao.selectPage(new Page<>(pageIndex, pageSize), queryWrapper);
+        return parsePage(page);
+    }
+
+    /**
+     * 转化分页查询的结果
+     */
+    public PageData parsePage(Page<TeamTypes> p) {
+        List<Map<String, Object>> resl = new ArrayList<>();
+        for (TeamTypes teamTypes : p.getRecords()) {
+            Map<String, Object> temp = new HashMap<>();
+            temp.put("id", teamTypes.getId());
+            temp.put("name", teamTypes.getName());
+            temp.put("createTime", teamTypes.getCreateTime());
+            resl.add(temp);
+        }
+        return new PageData(p.getCurrent(), p.getSize(), p.getTotal(), resl);
+    }
 }

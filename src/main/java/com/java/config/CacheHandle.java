@@ -19,7 +19,6 @@ public class CacheHandle {
 
     /**
      * 获取用户缓存对象
-     * @return
      */
     public Cache getUserCache(){
         return cacheManager.getCache(USER_KEY);
@@ -46,8 +45,6 @@ public class CacheHandle {
 
     /**
      * 获取缓存的登录用户信息
-     * @param key 缓存用户 token
-     * @return
      */
     public String getUserInfoCache(String key){
         Cache cache = getUserCache();

@@ -12,8 +12,7 @@ import com.java.vo.PageData;
 import com.java.vo.R;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,9 +24,8 @@ import javax.annotation.Resource;
 @Controller
 @RequestMapping("/members")
 @Api(tags = "成员信息")
+@Slf4j
 public class MembersController {
-
-    protected static final Logger Log = LoggerFactory.getLogger(MembersController.class);
 
     @Resource
     private CacheHandle cacheHandle;
@@ -48,7 +46,7 @@ public class MembersController {
     @ResponseBody
     @ApiOperation("查找指定成员信息")
     public R getInfo(@RequestBody IdDto idDto) {
-        Log.info("查找指定成员信息，ID：{}", idDto.getId());
+        log.info("查找指定成员信息，ID：{}", idDto.getId());
         Members members = membersService.getOne(idDto.getId());
         return R.successData(members);
     }
@@ -59,14 +57,14 @@ public class MembersController {
     public R getPageInfos(@RequestBody ApplylogsOrUserPageDto applylogsOrUserPageDto) {
         Users user = usersService.getOne(cacheHandle.getUserInfoCache(applylogsOrUserPageDto.getToken()));
         if (user.getType() == 0) {
-            Log.info("分页查找成员信息，当前页码：{}，"
+            log.info("分页查找成员信息，当前页码：{}，"
                             + "每页数据量：{}, 模糊查询，团队名称：{}，用户姓名：{}", applylogsOrUserPageDto.getPageIndex(),
                     applylogsOrUserPageDto.getPageIndex(), applylogsOrUserPageDto.getTeamName(), applylogsOrUserPageDto.getUserName());
             PageData page = membersService.getPageAll(applylogsOrUserPageDto.getPageIndex(),
                     applylogsOrUserPageDto.getPageIndex(), applylogsOrUserPageDto.getTeamName(), applylogsOrUserPageDto.getUserName());
             return R.successData(page);
         } else {
-            Log.info("分页查找成员信息，当前页码：{}，"
+            log.info("分页查找成员信息，当前页码：{}，"
                             + "每页数据量：{}, 模糊查询，团队名称：{}，用户姓名：{}", applylogsOrUserPageDto.getPageIndex(),
                     applylogsOrUserPageDto.getPageIndex(), applylogsOrUserPageDto.getTeamName(), applylogsOrUserPageDto.getUserName());
             PageData page = membersService.getPageByManId(applylogsOrUserPageDto.getPageIndex(),
@@ -100,7 +98,7 @@ public class MembersController {
         if (membersService.isManager(members.getTeamId(), members.getUserId())) {
             return R.warn("社团管理员无法移除");
         } else {
-            Log.info("删除成员信息, ID:{}", idDto.getId());
+            log.info("删除成员信息, ID:{}", idDto.getId());
             membersService.delete(members);
             return R.success();
         }

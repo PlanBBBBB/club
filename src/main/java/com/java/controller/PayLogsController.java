@@ -13,8 +13,7 @@ import com.java.vo.PageData;
 import com.java.vo.R;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,11 +23,10 @@ import javax.annotation.Resource;
  * 缴费记录
  */
 @Controller
-@RequestMapping("/payLogs")
+@RequestMapping("/paylogs")
 @Api(tags = "缴费记录")
+@Slf4j
 public class PayLogsController {
-
-    protected static final Logger Log = LoggerFactory.getLogger(PayLogsController.class);
 
     @Resource
     private CacheHandle cacheHandle;
@@ -37,7 +35,7 @@ public class PayLogsController {
     private UsersService usersService;
 
     @Resource
-    private PayLogsService payLogsService;
+    private PayLogsService paylogsService;
 
 
     @PostMapping("")
@@ -50,9 +48,9 @@ public class PayLogsController {
     @ResponseBody
     @ApiOperation("查找指定缴费记录")
     public R getInfo(@RequestBody IdDto idDto) {
-        Log.info("查找指定缴费记录，ID：{}", idDto.getId());
-        PayLogs payLogs = payLogsService.getOne(idDto.getId());
-        return R.successData(payLogs);
+        log.info("查找指定缴费记录，ID：{}", idDto.getId());
+        PayLogs paylogs = paylogsService.getOne(idDto.getId());
+        return R.successData(paylogs);
     }
 
     @PostMapping("/page")
@@ -61,24 +59,24 @@ public class PayLogsController {
     public R getPageInfos(@RequestBody ApplylogsOrUserPageDto applylogsOrUserPageDto) {
         Users user = usersService.getOne(cacheHandle.getUserInfoCache(applylogsOrUserPageDto.getToken()));
         if (user.getType() == 0) {
-            Log.info("分页查看全部缴费记录，当前页码：{}，"
+            log.info("分页查看全部缴费记录，当前页码：{}，"
                             + "每页数据量：{}, 模糊查询，团队名称：{}，用户姓名：{}", applylogsOrUserPageDto.getPageIndex(),
                     applylogsOrUserPageDto.getPageSize(), applylogsOrUserPageDto.getTeamName(), applylogsOrUserPageDto.getUserName());
-            PageData page = payLogsService.getPageInfo(applylogsOrUserPageDto.getPageIndex(),
+            PageData page = paylogsService.getPageInfo(applylogsOrUserPageDto.getPageIndex(),
                     applylogsOrUserPageDto.getPageSize(), null, applylogsOrUserPageDto.getTeamName(), applylogsOrUserPageDto.getUserName());
             return R.successData(page);
         } else if (user.getType() == 1) {
-            Log.info("团队管理员查看缴费记录，当前页码：{}，"
+            log.info("团队管理员查看缴费记录，当前页码：{}，"
                             + "每页数据量：{}, 模糊查询，团队名称：{}，用户姓名：{}", applylogsOrUserPageDto.getPageIndex(),
                     applylogsOrUserPageDto.getPageSize(), applylogsOrUserPageDto.getTeamName(), applylogsOrUserPageDto.getUserName());
-            PageData page = payLogsService.getManPageInfo(applylogsOrUserPageDto.getPageIndex(),
+            PageData page = paylogsService.getManPageInfo(applylogsOrUserPageDto.getPageIndex(),
                     applylogsOrUserPageDto.getPageSize(), user.getId(), applylogsOrUserPageDto.getTeamName(), applylogsOrUserPageDto.getUserName());
             return R.successData(page);
         } else {
-            Log.info("分页用户相关缴费记录，当前页码：{}，"
+            log.info("分页用户相关缴费记录，当前页码：{}，"
                             + "每页数据量：{}, 模糊查询，团队名称：{}，用户姓名：{}", applylogsOrUserPageDto.getPageIndex(),
                     applylogsOrUserPageDto.getPageSize(), applylogsOrUserPageDto.getTeamName(), applylogsOrUserPageDto.getUserName());
-            PageData page = payLogsService.getPageInfo(applylogsOrUserPageDto.getPageIndex(),
+            PageData page = paylogsService.getPageInfo(applylogsOrUserPageDto.getPageIndex(),
                     applylogsOrUserPageDto.getPageSize(), user.getId(), applylogsOrUserPageDto.getTeamName(), null);
             return R.successData(page);
         }
@@ -87,20 +85,20 @@ public class PayLogsController {
     @PostMapping("/add")
     @ResponseBody
     @ApiOperation("添加缴费记录")
-    public R addInfo(@RequestBody PayLogs payLogs) {
-        payLogs.setId(IDUtils.makeIDByCurrent());
-        payLogs.setCreateTime(DateUtils.getNowDate());
-        Log.info("添加缴费记录，传入参数：{}", payLogs);
-        payLogsService.add(payLogs);
+    public R addInfo(@RequestBody PayLogs paylogs) {
+        paylogs.setId(IDUtils.makeIDByCurrent());
+        paylogs.setCreateTime(DateUtils.getNowDate());
+        log.info("添加缴费记录，传入参数：{}", paylogs);
+        paylogsService.add(paylogs);
         return R.success();
     }
 
     @PostMapping("/upd")
     @ResponseBody
     @ApiOperation("修改缴费记录")
-    public R updInfo(@RequestBody PayLogs payLogs) {
-        Log.info("修改缴费记录，传入参数：{}", payLogs);
-        payLogsService.update(payLogs);
+    public R updInfo(@RequestBody PayLogs paylogs) {
+        log.info("修改缴费记录，传入参数：{}", paylogs);
+        paylogsService.update(paylogs);
         return R.success();
     }
 
@@ -108,9 +106,9 @@ public class PayLogsController {
     @ResponseBody
     @ApiOperation("删除缴费记录")
     public R delInfo(@RequestBody IdDto idDto) {
-        Log.info("删除缴费记录, ID:{}", idDto.getId());
-        PayLogs payLogs = payLogsService.getOne(idDto.getId());
-        payLogsService.delete(payLogs);
+        log.info("删除缴费记录, ID:{}", idDto.getId());
+        PayLogs paylogs = paylogsService.getOne(idDto.getId());
+        paylogsService.delete(paylogs);
         return R.success();
     }
 }

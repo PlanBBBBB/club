@@ -12,8 +12,7 @@ import com.java.utils.IDUtils;
 import com.java.vo.R;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,9 +26,8 @@ import java.util.Map;
 @Controller
 @RequestMapping("/activeLogs")
 @Api(tags = "报名记录")
+@Slf4j
 public class ActiveLogsController {
-
-    protected static final Logger Log = LoggerFactory.getLogger(ActiveLogsController.class);
 
     @Resource
     private CacheHandle cacheHandle;
@@ -50,7 +48,7 @@ public class ActiveLogsController {
     @ResponseBody
     @ApiOperation(value = "获取指定报名记录")
     public R getInfo(@RequestBody IdDto idDto) {
-        Log.info("查找指定报名记录，ID：{}", idDto.getId());
+        log.info("查找指定报名记录，ID：{}", idDto.getId());
         ActiveLogs activeLogs = activeLogsService.getOne(idDto.getId());
         return R.successData(activeLogs);
     }
@@ -59,7 +57,7 @@ public class ActiveLogsController {
     @ResponseBody
     @ApiOperation(value = "获取指定活动的报名记录")
     public R getList(@RequestBody IdDto idDto) {
-        Log.info("获取指定活动的报名记录，活动ID：{}", idDto.getId());
+        log.info("获取指定活动的报名记录，活动ID：{}", idDto.getId());
         List<Map<String, Object>> list = activeLogsService.getListByActiveId(idDto.getId());
         return R.successData(list);
     }
@@ -73,7 +71,7 @@ public class ActiveLogsController {
             addActivelogsDto.setId(IDUtils.makeIDByCurrent());
             addActivelogsDto.setUserId(user.getId());
             addActivelogsDto.setCreateTime(DateUtils.getNowDate());
-            Log.info("添加报名记录，传入参数：{}", addActivelogsDto);
+            log.info("添加报名记录，传入参数：{}", addActivelogsDto);
             activeLogsService.add(addActivelogsDto);
             return R.success();
         } else {
@@ -85,7 +83,7 @@ public class ActiveLogsController {
     @ResponseBody
     @ApiOperation(value = "修改报名记录")
     public R updInfo(@RequestBody ActiveLogs activeLogs) {
-        Log.info("修改报名记录，传入参数：{}", activeLogs);
+        log.info("修改报名记录，传入参数：{}", activeLogs);
         activeLogsService.update(activeLogs);
         return R.success();
     }
@@ -94,7 +92,7 @@ public class ActiveLogsController {
     @ResponseBody
     @ApiOperation(value = "删除报名记录")
     public R delInfo(@RequestBody IdDto idDto) {
-        Log.info("删除报名记录, ID:{}", idDto.getId());
+        log.info("删除报名记录, ID:{}", idDto.getId());
         ActiveLogs activeLogs = activeLogsService.getOne(idDto.getId());
         activeLogsService.delete(activeLogs);
         return R.success();

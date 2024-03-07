@@ -12,8 +12,7 @@ import com.java.vo.PageData;
 import com.java.vo.R;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,11 +24,9 @@ import javax.annotation.Resource;
 @Controller
 @RequestMapping("/activities")
 @Api(tags = "活动信息")
+@Slf4j
 public class ActivitiesController {
-
-    protected static final Logger Log = LoggerFactory.getLogger(ActivitiesController.class);
-
-
+    
     @Resource
     private CacheHandle cacheHandle;
 
@@ -49,7 +46,7 @@ public class ActivitiesController {
     @ResponseBody
     @ApiOperation("查找指定活动信息")
     public R getInfo(@RequestBody IdDto idDto) {
-        Log.info("查找指定活动信息，ID：{}", idDto.getId());
+        log.info("查找指定活动信息，ID：{}", idDto.getId());
         Activities activities = activitiesService.getOne(idDto.getId());
         return R.successData(activities);
     }
@@ -60,14 +57,14 @@ public class ActivitiesController {
     public R getPageInfos(@RequestBody ActivePageDto activePageDto) {
         Users user = usersService.getOne(cacheHandle.getUserInfoCache(activePageDto.getToken()));
         if (user.getType() == 0) {
-            Log.info("分页查找活动信息，当前页码：{}，"
+            log.info("分页查找活动信息，当前页码：{}，"
                             + "每页数据量：{}, 模糊查询，社团名称：{}，活动名称：{}", activePageDto.getPageIndex(),
                     activePageDto.getPageSize(), activePageDto.getTeamName(), activePageDto.getActiveName());
             PageData page = activitiesService.getPageAll(activePageDto.getPageIndex(),
                     activePageDto.getPageSize(), activePageDto.getTeamName(), activePageDto.getActiveName());
             return R.successData(page);
         } else {
-            Log.info("分页查找活动信息，当前页码：{}，"
+            log.info("分页查找活动信息，当前页码：{}，"
                             + "每页数据量：{}, 模糊查询，社团名称：{}，活动名称：{}", activePageDto.getPageIndex(),
                     activePageDto.getPageSize(), activePageDto.getTeamName(), activePageDto.getActiveName());
             PageData page = activitiesService.getPageByUserId(activePageDto.getPageIndex(),
@@ -81,7 +78,7 @@ public class ActivitiesController {
     @ApiOperation("添加活动信息")
     public R addInfo(@RequestBody Activities activities) {
         activities.setId(IDUtils.makeIDByCurrent());
-        Log.info("添加活动信息，传入参数：{}", activities);
+        log.info("添加活动信息，传入参数：{}", activities);
         activitiesService.add(activities);
         return R.success();
     }
@@ -90,7 +87,7 @@ public class ActivitiesController {
     @ResponseBody
     @ApiOperation("修改活动信息")
     public R updInfo(@RequestBody Activities activities) {
-        Log.info("修改活动信息，传入参数：{}", activities);
+        log.info("修改活动信息，传入参数：{}", activities);
         activitiesService.update(activities);
         return R.success();
     }
@@ -99,7 +96,7 @@ public class ActivitiesController {
     @ResponseBody
     @ApiOperation("删除活动信息")
     public R delInfo(@RequestBody IdDto idDto) {
-        Log.info("删除活动信息, ID:{}", idDto.getId());
+        log.info("删除活动信息, ID:{}", idDto.getId());
         Activities activities = activitiesService.getOne(idDto.getId());
         activitiesService.delete(activities);
         return R.success();

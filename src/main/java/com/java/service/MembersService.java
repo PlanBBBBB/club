@@ -1,54 +1,102 @@
 package com.java.service;
 
-
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.java.dao.*;
 import com.java.dto.MemberAddDto;
-import com.java.entity.Members;
+import com.java.entity.*;
+import com.java.utils.IDUtils;
 import com.java.vo.PageData;
+import org.springframework.beans.BeanUtils;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-/**
- * 业务层处理
- * 成员信息
- */
-public interface MembersService {
+import javax.annotation.Resource;
+import java.util.Map;
+
+@Service("membersService")
+public class MembersService {
+
+    @Resource
+    private TeamsDao teamsDao;
+
+    @Resource
+    private MembersDao membersDao;
+
+    @Resource
+    private PayLogsDao payLogsDao;
+
+    @Resource
+    private ActiveLogsDao activeLogsDao;
+
+    @Resource
+    private ApplyLogsDao applyLogsDao;
+
+    
+    public void add(MemberAddDto memberAddDto) {
+        Members members = new Members();
+        BeanUtils.copyProperties(memberAddDto,members);
+        members.setId(IDUtils.makeIDByCurrent());
+        membersDao.insert(members);
+    }
+
+
+    
+    public void update(Members members) {
+        membersDao.updateById(members);
+    }
+
+    
+    @Transactional
+    public void delete(Members members) {
+
+        LambdaQueryWrapper<PayLogs> qw_pay = new LambdaQueryWrapper<>();
+        qw_pay.eq(PayLogs::getUserId, members.getUserId());
+        payLogsDao.delete(qw_pay);
+
+        LambdaQueryWrapper<ActiveLogs> qw_active = new LambdaQueryWrapper<>();
+        qw_active.eq(ActiveLogs::getUserId, members.getUserId());
+        activeLogsDao.delete(qw_active);
+
+        LambdaQueryWrapper<ApplyLogs> qw_apply = new LambdaQueryWrapper<>();
+        qw_apply.eq(ApplyLogs::getUserId, members.getUserId());
+        applyLogsDao.delete(qw_apply);
+
+        membersDao.deleteById(members);
+
+        Teams team = teamsDao.selectById(members.getTeamId());
+        team.setTotal(team.getTotal() - 1);
+        teamsDao.updateById(team);
+    }
+
+    
+    public Members getOne(String id) {
+        return membersDao.selectById(id);
+    }
+
+    
+    public Boolean isManager(String teamId, String userId){
+        LambdaQueryWrapper<Teams> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Teams::getId, teamId).eq(Teams::getManager, userId);
+        return teamsDao.selectCount(queryWrapper) > 0;
+    }
+
+    
+    public PageData getPageAll(Long pageIndex, Long pageSize, String teamName, String userName) {
+        Page<Map<String, Object>> page = membersDao.qryPageAll(new Page<>(pageIndex, pageSize), teamName, userName);
+        return parsePage(page);
+    }
+
+    
+    public PageData getPageByManId(Long pageIndex, Long pageSize, String manId, String teamName, String userName) {
+        Page<Map<String, Object>> page = membersDao.qryPageByManId(new Page<>(pageIndex, pageSize), manId, teamName, userName);
+        return parsePage(page);
+    }
 
     /**
-     * 指定用户是否是管理员
-     *
-     * @param userId 指定用户ID
-     * @param teamId 团队ID
-     * @return
+     * 转化分页查询的结果
      */
-    public Boolean isManager(String teamId, String userId);
-
-    /**
-     * 分页查询成员信息信息
-     *
-     * @param pageIndex 当前页码
-     * @param pageSize  每页数据量
-     * @param teamName  社团名称
-     * @param userName  成员姓名
-     * @return
-     */
-    public PageData getPageAll(Long pageIndex, Long pageSize, String teamName, String userName);
-
-    /**
-     * 分页查询成员信息信息
-     *
-     * @param pageIndex 当前页码
-     * @param pageSize  每页数据量
-     * @param manId     管理员ID
-     * @param teamName  社团名称
-     * @param userName  成员姓名
-     * @return
-     */
-    public PageData getPageByManId(Long pageIndex, Long pageSize, String manId, String teamName, String userName);
-
-    void add(MemberAddDto memberAddDto);
-
-    void update(Members members);
-
-    Members getOne(String id);
-
-    void delete(Members members);
-
+    public PageData parsePage(Page<Map<String, Object>> p) {
+        return new PageData(p.getCurrent(), p.getSize(), p.getTotal(), p.getRecords());
+    }
 }

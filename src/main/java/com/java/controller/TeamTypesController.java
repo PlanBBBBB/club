@@ -10,8 +10,7 @@ import com.java.vo.PageData;
 import com.java.vo.R;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,9 +23,8 @@ import java.util.List;
 @Controller
 @RequestMapping("/teamTypes")
 @Api(tags = "社团类型管理")
+@Slf4j
 public class TeamTypesController {
-
-    protected static final Logger Log = LoggerFactory.getLogger(TeamTypesController.class);
 
     @Resource
     private TeamTypesService teamTypesService;
@@ -41,7 +39,7 @@ public class TeamTypesController {
     @ResponseBody
     @ApiOperation("查看全部的社团类型信息")
     public R getAll() {
-        Log.info("查看全部的社团类型信息");
+        log.info("查看全部的社团类型信息");
         List<TeamTypes> list = teamTypesService.getAll();
         return R.successData(list);
     }
@@ -50,7 +48,7 @@ public class TeamTypesController {
     @ResponseBody
     @ApiOperation("查找指定社团类型")
     public R getInfo(@RequestBody IdDto idDto) {
-        Log.info("查找指定社团类型，ID：{}", idDto.getId());
+        log.info("查找指定社团类型，ID：{}", idDto.getId());
         TeamTypes teamTypes = teamTypesService.getOne(idDto.getId());
         return R.successData(teamTypes);
     }
@@ -59,7 +57,7 @@ public class TeamTypesController {
     @ResponseBody
     @ApiOperation("分页查找社团类型")
     public R getPageInfos(@RequestBody TeamTypesPageDto teamTypesPageDto) {
-        Log.info("分页查找社团类型，当前页码：{}，"
+        log.info("分页查找社团类型，当前页码：{}，"
                         + "每页数据量：{}, 模糊查询，附加参数：{}", teamTypesPageDto.getPageIndex(),
                 teamTypesPageDto.getPageSize(), teamTypesPageDto.getName());
         PageData page = teamTypesService.getPageInfo(teamTypesPageDto.getPageIndex(),
@@ -73,7 +71,7 @@ public class TeamTypesController {
     public R addInfo(@RequestBody TeamTypes teamTypes) {
         teamTypes.setId(IDUtils.makeIDByCurrent());
         teamTypes.setCreateTime(DateUtils.getNowDate());
-        Log.info("添加社团类型，传入参数：{}", teamTypes);
+        log.info("添加社团类型，传入参数：{}", teamTypes);
         teamTypesService.add(teamTypes);
         return R.success();
     }
@@ -82,7 +80,7 @@ public class TeamTypesController {
     @ResponseBody
     @ApiOperation("修改社团类型")
     public R updInfo(@RequestBody TeamTypes teamTypes) {
-        Log.info("修改社团类型，传入参数：{}", teamTypes);
+        log.info("修改社团类型，传入参数：{}", teamTypes);
         teamTypesService.update(teamTypes);
         return R.success();
     }
@@ -92,7 +90,7 @@ public class TeamTypesController {
     @ApiOperation("删除社团类型")
     public R delInfo(@RequestBody IdDto idDto) {
         if (teamTypesService.isRemove(idDto.getId())) {
-            Log.info("删除社团类型, ID:{}", idDto.getId());
+            log.info("删除社团类型, ID:{}", idDto.getId());
             TeamTypes teamTypes = teamTypesService.getOne(idDto.getId());
             teamTypesService.delete(teamTypes);
             return R.success();

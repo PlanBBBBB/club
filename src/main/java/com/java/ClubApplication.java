@@ -9,8 +9,8 @@ import org.springframework.cache.annotation.EnableCaching;
 @SpringBootApplication
 @MapperScan({"com.java.dao"})
 @EnableCaching
-public class Application {
+public class ClubApplication {
     public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
+        SpringApplication.run(ClubApplication.class, args);
     }
 }

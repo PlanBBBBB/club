@@ -1,36 +1,87 @@
 package com.java.service;
 
-
-
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.java.dao.ActiveLogsDao;
+import com.java.dao.StyleDao;
+import com.java.dao.TeamsDao;
+import com.java.entity.ActiveLogs;
 import com.java.entity.Style;
+import com.java.entity.Teams;
+import com.java.utils.DateUtils;
+import com.java.utils.IDUtils;
 import com.java.vo.PageData;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
+import java.util.Map;
 
-/**
- * 业务层处理
- * 报名记录
- */
-public interface StyleService extends BaseService<Style, String> {
+@Service("styleService")
+public class StyleService {
+
+    @Resource
+    private TeamsDao teamsDao;
+
+    @Resource
+    private ActiveLogsDao activeLogsDao;
+
+    @Resource
+    private StyleDao styleDao;
+
+    
+    @Transactional
+    public void add(Style style) {
+        styleDao.insert(style);
+        Teams teams = teamsDao.selectById(style.getTeamId());
+        ActiveLogs activeLog = new ActiveLogs();
+        activeLog.setId(IDUtils.makeIDByCurrent());
+        activeLog.setActiveId(style.getId());
+        activeLog.setUserId(teams.getManager());
+        activeLog.setCreateTime(DateUtils.getNowDate());
+        activeLogsDao.insert(activeLog);
+    }
+
+    
+    public void update(Style style) {
+        styleDao.updateById(style);
+    }
+
+    
+    @Transactional
+    public void delete(Style style) {
+        LambdaQueryWrapper<ActiveLogs> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(ActiveLogs::getActiveId, style.getId());
+        activeLogsDao.delete(queryWrapper);
+        styleDao.deleteById(style);
+    }
+
+    
+    public Style getOne(String id) {
+        return styleDao.selectById(id);
+    }
+
+    
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+    public PageData getPageAll(Long pageIndex, Long pageSize, String activeName, String teamName) {
+        Page<Map<String, Object>> page =
+                styleDao.qryPageAll(new Page<>(pageIndex, pageSize), activeName, teamName);
+        return parsePage(page);
+    }
+
+    
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+    public PageData getPageByUserId(Long pageIndex, Long pageSize, String userId, String activeName, String teamName) {
+        Page<Map<String, Object>> page =
+                styleDao.qryPageByMemId(new Page<>(pageIndex, pageSize), userId, activeName, teamName);
+        return parsePage(page);
+    }
 
     /**
-     * 分页查询风采信息信息
-     * @param pageIndex 当前页码
-     * @param pageSize 每页数据量
-     * @param activeName 风采名称
-     * @param teamName 团队名称
-     * @return
+     * 转化分页查询的结果
      */
-    public PageData getPageAll(Long pageIndex, Long pageSize, String activeName, String teamName);
-
-
-    /**
-     * 分页查询指定成员相关风采信息信息
-     * @param pageIndex 当前页码
-     * @param pageSize 每页数据量
-     * @param userId 指定成员ID
-     * @param activeName 风采名称
-     * @param teamName 团队名称
-     * @return
-     */
-    public PageData getPageByUserId(Long pageIndex, Long pageSize, String userId, String activeName, String teamName);
+    public PageData parsePage(Page<Map<String, Object>> p) {
+        return new PageData(p.getCurrent(), p.getSize(), p.getTotal(), p.getRecords());
+    }
 }

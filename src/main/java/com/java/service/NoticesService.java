@@ -1,55 +1,104 @@
 package com.java.service;
 
-
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.java.dao.NoticesDao;
+import com.java.dao.TeamsDao;
 import com.java.entity.Notices;
+import com.java.entity.Teams;
+import com.java.utils.StringUtils;
 import com.java.vo.PageData;
+import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-/**
- * 业务层处理
- * 通知记录
- */
-public interface NoticesService extends BaseService<Notices, String> {
+@Service("noticesService")
+public class NoticesService {
 
-	/**
-	 * 获取系统发布的通知信息
-	 * @return
-	 */
-	public List<Notices> getSysNotices();
+    @Resource
+    private NoticesDao noticesDao;
 
-	/**
-	 * 获取社团管理员相关的通知信息
-	 * @param manId 社团管理员ID
-	 * @return
-	 */
-	public List<Notices> getManNotices(String manId);
+	@Resource
+	private TeamsDao teamsDao;
 
-	/**
-	 * 获取社团成员相关通知信息
-	 * @param memId 社团成员ID
-	 * @return
-	 */
-	public List<Notices> getMemNotices(String memId);
+    
+    public void add(Notices notices) {
+        noticesDao.insert(notices);
+    }
 
-	/**
-	 * 分页查询通知记录信息
-	 * @param pageIndex 当前页码
-	 * @param pageSize 每页数据量
-	 * @param title 通知标题
-	 * @param teamName 社团名称
-	 * @return
-	 */	
-	public PageData getPageAll(Long pageIndex, Long pageSize, String title, String teamName);
+    
+    public void update(Notices notices) {
+        noticesDao.updateById(notices);
+    }
 
-	/**
-	 * 分页查询指定用户相关通知记录信息
-	 * @param pageIndex 当前页码
-	 * @param pageSize 每页数据量
-	 * @param userId 用户ID
-	 * @param title 通知标题
-	 * @param teamName 社团名称
-	 * @return
-	 */
-	public PageData getPageById(Long pageIndex, Long pageSize, String userId, String title, String teamName);
+    
+    public void delete(Notices notices) {
+        noticesDao.deleteById(notices);
+    }
+
+    
+    public Notices getOne(String id) {
+        return noticesDao.selectById(id);
+    }
+
+    
+    public List<Notices> getSysNotices(){
+        return noticesDao.qrySysNotices();
+    }
+
+    
+    public List<Notices> getManNotices(String manId){
+        return noticesDao.qryManNotices(manId);
+    }
+
+    
+    public List<Notices> getMemNotices(String memId){
+        return noticesDao.qryMemNotices(memId);
+    }
+
+    
+    public PageData getPageAll(Long pageIndex, Long pageSize, String title, String teamName){
+        Page<Map<String, Object>>  page = noticesDao.qryPageAll(new Page<>(pageIndex, pageSize), title, teamName);
+        return parsePage(page);
+    }
+
+    
+    public PageData getPageById(Long pageIndex, Long pageSize, String userId, String title, String teamName){
+        Page<Map<String, Object>>  page = noticesDao.qryPageById(new Page<>(pageIndex, pageSize), userId, title, teamName);
+        return parsePage(page);
+    }
+
+    /**
+     * 查询列表结果转换
+     */
+    public List<Map<String, Object>> parseList(List<Notices> notices){
+        List<Map<String, Object>> resl = new ArrayList<>();
+        for (Notices notice : notices) {
+            Map<String, Object> temp = new HashMap<>();
+            temp.put("id", notice.getId());
+            temp.put("title", notice.getTitle());
+            temp.put("detail", notice.getDetail());
+            temp.put("createTime", notice.getCreateTime());
+            if(StringUtils.isNotNullOrEmpty(notice.getTeamId())){
+                Teams teams = teamsDao.selectById(notice.getTeamId());
+                temp.put("teamId", notice.getTeamId());
+                temp.put("teamName", teams.getName());
+                temp.put("isTeam", true);
+            }else{
+                temp.put("isTeam", false);
+            }
+            resl.add(temp);
+        }
+        return resl;
+    }
+
+    /**
+     * 转化分页查询的结果
+     */
+    public PageData parsePage(Page<Map<String, Object>> p) {
+        return new PageData(p.getCurrent(), p.getSize(), p.getTotal(), p.getRecords());
+    }
 }

@@ -12,8 +12,7 @@ import com.java.utils.IDUtils;
 import com.java.vo.R;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -22,9 +21,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/")
 @Api(tags = "首页")
+@Slf4j
 public class IndexController {
-
-    private static final Logger Log = LoggerFactory.getLogger(IndexController.class);
 
     @Resource
     private UsersService usersService;
@@ -56,7 +54,7 @@ public class IndexController {
     @ResponseBody
     @ApiOperation("用户登录")
     public R login(@RequestBody LoginDto loginDto) {
-        Log.info("用户登录，用户名：{}， 用户密码：{}", loginDto.getUserName(), loginDto.getPassWord());
+        log.info("用户登录，用户名：{}， 用户密码：{}", loginDto.getUserName(), loginDto.getPassWord());
         Users user = usersService.getUserByUserName(loginDto.getUserName());
         if (user == null) {
             return R.error("输入的用户名不存在");
@@ -75,7 +73,7 @@ public class IndexController {
     @ResponseBody
     @ApiOperation("用户退出")
     public R exit(@RequestBody TokenDto tokenDto) {
-        Log.info("用户退出系统并移除登录信息");
+        log.info("用户退出系统并移除登录信息");
         cacheHandle.removeUserCache(tokenDto.getToken());
         return R.success();
     }
@@ -92,7 +90,7 @@ public class IndexController {
     @ResponseBody
     @ApiOperation("修改用户信息")
     public R info(@RequestBody Users user) {
-        Log.info("修改用户信息，{}", user);
+        log.info("修改用户信息，{}", user);
         usersService.update(user);
         return R.success();
     }
@@ -113,7 +111,7 @@ public class IndexController {
     @ResponseBody
     @ApiOperation("修改用户密码")
     public R pwd(@RequestBody PwdDto pwdDto) {
-        Log.info("修改用户密码，{}", pwdDto.getPassword());
+        log.info("修改用户密码，{}", pwdDto.getPassword());
         Users user = usersService.getOne(cacheHandle.getUserInfoCache(pwdDto.getToken()));
         user.setPassWord(pwdDto.getPassword());
         usersService.update(user);

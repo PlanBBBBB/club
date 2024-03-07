@@ -50,7 +50,7 @@ public class Users implements Serializable {
     private String address;
 
     @TableField(value = "status")
-    @ApiModelProperty(value = "信息状态")
+    @ApiModelProperty(value = "信息状态（0-失效，1-有效）")
     private Integer status;
 
     @TableField(value = "create_time")
@@ -58,6 +58,6 @@ public class Users implements Serializable {
     private String createTime;
 
     @TableField(value = "type")
-    @ApiModelProperty(value = "用户身份")
+    @ApiModelProperty(value = "用户身份（0-管理员，1-普通用户）")
     private Integer type;
 }
