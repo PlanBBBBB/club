@@ -116,6 +116,11 @@ public class MembersService {
         if (i > 0) {
             return R.error("您已经是团队成员了");
         }
+        Integer i1 = applyDao.selectCount(new LambdaQueryWrapper<Apply>().eq(Apply::getUserId, memberAddDto.getUserId())
+                .eq(Apply::getTeamId, memberAddDto.getTeamId()));
+        if (i1 > 0) {
+            return R.error("您已经申请过了");
+        }
         Apply apply = new Apply();
         BeanUtils.copyProperties(memberAddDto, apply);
         apply.setSuccess("0");
