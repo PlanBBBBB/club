@@ -82,6 +82,13 @@ public class MembersController {
         return R.success();
     }
 
+    @PostMapping("/apply")
+    @ResponseBody
+    @ApiOperation("申请加入社团")
+    public R apply(@RequestBody MemberAddDto memberAddDto) {
+        return membersService.apply(memberAddDto);
+    }
+
     @PostMapping("/upd")
     @ResponseBody
     @ApiOperation("修改成员信息")

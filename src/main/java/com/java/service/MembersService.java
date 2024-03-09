@@ -7,6 +7,7 @@ import com.java.dto.MemberAddDto;
 import com.java.entity.*;
 import com.java.utils.IDUtils;
 import com.java.vo.PageData;
+import com.java.vo.R;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,21 +33,23 @@ public class MembersService {
     @Resource
     private ApplyLogsDao applyLogsDao;
 
-    
+    @Resource
+    private ApplyDao applyDao;
+
+
     public void add(MemberAddDto memberAddDto) {
         Members members = new Members();
-        BeanUtils.copyProperties(memberAddDto,members);
+        BeanUtils.copyProperties(memberAddDto, members);
         members.setId(IDUtils.makeIDByCurrent());
         membersDao.insert(members);
     }
 
 
-    
     public void update(Members members) {
         membersDao.updateById(members);
     }
 
-    
+
     @Transactional
     public void delete(Members members) {
 
@@ -69,25 +72,25 @@ public class MembersService {
         teamsDao.updateById(team);
     }
 
-    
+
     public Members getOne(String id) {
         return membersDao.selectById(id);
     }
 
-    
-    public Boolean isManager(String teamId, String userId){
+
+    public Boolean isManager(String teamId, String userId) {
         LambdaQueryWrapper<Teams> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(Teams::getId, teamId).eq(Teams::getManager, userId);
         return teamsDao.selectCount(queryWrapper) > 0;
     }
 
-    
+
     public PageData getPageAll(Long pageIndex, Long pageSize, String teamName, String userName) {
         Page<Map<String, Object>> page = membersDao.qryPageAll(new Page<>(pageIndex, pageSize), teamName, userName);
         return parsePage(page);
     }
 
-    
+
     public PageData getPageByManId(Long pageIndex, Long pageSize, String manId, String teamName, String userName) {
         Page<Map<String, Object>> page = membersDao.qryPageByManId(new Page<>(pageIndex, pageSize), manId, teamName, userName);
         return parsePage(page);
@@ -98,5 +101,26 @@ public class MembersService {
      */
     public PageData parsePage(Page<Map<String, Object>> p) {
         return new PageData(p.getCurrent(), p.getSize(), p.getTotal(), p.getRecords());
+    }
+
+    public R apply(MemberAddDto memberAddDto) {
+        Teams team = teamsDao.selectById(memberAddDto.getTeamId());
+        if (team == null) {
+            return R.error("团队不存在");
+        }
+        if (team.getManager().equals(memberAddDto.getUserId())){
+            return R.error("社长不能申请加入自己的团队");
+        }
+        Integer i = membersDao.selectCount(new LambdaQueryWrapper<Members>().eq(Members::getUserId, memberAddDto.getUserId())
+                .eq(Members::getTeamId, memberAddDto.getTeamId()));
+        if (i > 0) {
+            return R.error("您已经是团队成员了");
+        }
+        Apply apply = new Apply();
+        BeanUtils.copyProperties(memberAddDto, apply);
+        apply.setSuccess("0");
+        apply.setId(IDUtils.makeIDByCurrent());
+        applyDao.insert(apply);
+        return R.success();
     }
 }

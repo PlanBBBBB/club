@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service("teamsService")
 public class TeamsService {
@@ -48,8 +49,10 @@ public class TeamsService {
     @Resource
     private PayLogsDao payLogsDao;
 
+    @Resource
+    private ApplyDao applyDao;
 
-    
+
     @Transactional
     public void add(Teams teams) {
         teamsDao.insert(teams);
@@ -64,12 +67,12 @@ public class TeamsService {
         usersDao.updateById(user);
     }
 
-    
+
     public void update(Teams teams) {
         teamsDao.updateById(teams);
     }
 
-    
+
     @Transactional
     public void delete(Teams teams) {
 
@@ -111,26 +114,26 @@ public class TeamsService {
         }
     }
 
-    
+
     public Teams getOne(String id) {
         return teamsDao.selectById(id);
     }
 
-    
+
     public List<Teams> getAll() {
         LambdaQueryWrapper<Teams> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.orderByDesc(Teams::getCreateTime);
         return teamsDao.selectList(queryWrapper);
     }
 
-    
+
     public List<Teams> getListByManId(String manId) {
         LambdaQueryWrapper<Teams> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(Teams::getManager,manId).orderByDesc(Teams::getCreateTime);
+        queryWrapper.eq(Teams::getManager, manId).orderByDesc(Teams::getCreateTime);
         return teamsDao.selectList(queryWrapper);
     }
 
-    
+
     public PageData getPageInfo(Long pageIndex, Long pageSize, String name, String typeId, String manager) {
         LambdaQueryWrapper<Teams> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.like(StringUtils.isNotNullOrEmpty(name), Teams::getName, name)
@@ -169,5 +172,51 @@ public class TeamsService {
         }
 
         return new PageData(p.getCurrent(), p.getSize(), p.getTotal(), resl);
+    }
+
+    public PageData parsePageV2(Page<Apply> p) {
+        List<Map<String, Object>> resl = new ArrayList<>();
+        for (Apply apply : p.getRecords()) {
+            Map<String, Object> temp = new HashMap<>();
+            temp.put("id", apply.getId());
+            temp.put("userId", apply.getUserId());
+            temp.put("teamId", apply.getTeamId());
+            temp.put("success", apply.getSuccess());
+            resl.add(temp);
+        }
+        return new PageData(p.getCurrent(), p.getSize(), p.getTotal(), resl);
+    }
+
+
+    public PageData getApplyPage(String userId, Long pageSize, Long pageIndex) {
+        // 获取团队信息列表，可能会有多个团队满足条件
+        List<Teams> teamsList = teamsDao.selectList(new QueryWrapper<Teams>().eq("manager", userId));
+        // 如果没有找到符合条件的团队信息，则直接返回空列表
+        if (teamsList.isEmpty()) {
+            return new PageData(pageIndex, pageSize, 0L, new ArrayList<>());
+        }
+        // 构造团队ID列表，用于查询申请记录
+        List<String> teamIds = teamsList.stream().map(Teams::getId).collect(Collectors.toList());
+
+        // 构造查询条件：申请成功为0（未处理），并且团队ID在指定的团队ID列表中
+        LambdaQueryWrapper<Apply> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Apply::getSuccess, "0")
+                .in(Apply::getTeamId, teamIds);
+        // 执行分页查询
+        Page<Apply> page = applyDao.selectPage(new Page<>(pageIndex, pageSize), queryWrapper);
+        return parsePageV2(page);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void deal(Apply apply) {
+        applyDao.updateById(apply);
+        if ("1".equals(apply.getSuccess())){
+            Members members = new Members();
+            members.setId(IDUtils.makeIDByCurrent());
+            members.setTeamId(apply.getTeamId());
+            members.setUserId(apply.getUserId());
+            membersDao.insert(members);
+        }
+
     }
 }
