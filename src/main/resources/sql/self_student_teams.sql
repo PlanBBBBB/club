@@ -11,7 +11,7 @@
  Target Server Version : 80100 (8.1.0)
  File Encoding         : 65001
 
- Date: 06/03/2024 10:09:07
+ Date: 09/03/2024 10:52:33
 */
 
 SET NAMES utf8mb4;
@@ -61,6 +61,23 @@ CREATE TABLE `activities`  (
 -- Records of activities
 -- ----------------------------
 INSERT INTO `activities` VALUES ('1679549264062', '测试活动', '11', '11', '11', 1, '2023-03-24 00:00:00', '1642422100000', NULL);
+
+-- ----------------------------
+-- Table structure for apply
+-- ----------------------------
+DROP TABLE IF EXISTS `apply`;
+CREATE TABLE `apply`  (
+  `id` char(13) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '主键id',
+  `team_id` char(13) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '社团id',
+  `user_id` char(13) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '用户id',
+  `success` tinyint(1) NULL DEFAULT NULL COMMENT '是否成功(0：未成功，1：成功，2：拒绝)',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of apply
+-- ----------------------------
+INSERT INTO `apply` VALUES ('1709951439038', '1642422100000', '1642422100000', 1);
 
 -- ----------------------------
 -- Table structure for apply_logs
@@ -126,6 +143,7 @@ INSERT INTO `members` VALUES ('1672148926606', '1672148926602', '1672148602348',
 INSERT INTO `members` VALUES ('1672148941775', '1642422100000', '1672148602348', '2024-03-06 10:03:59');
 INSERT INTO `members` VALUES ('1679549239565', '1672148926602', '1679549174356', '2024-03-06 10:03:59');
 INSERT INTO `members` VALUES ('1709690742210', '1672148926602', '1642422100001', '2023-12-19 10:05:18');
+INSERT INTO `members` VALUES ('1709952394134', '1642422100000', '1642422100000', '2024-03-09 10:46:34');
 
 -- ----------------------------
 -- Table structure for notices
@@ -246,7 +264,7 @@ CREATE TABLE `users`  (
   `age` int NULL DEFAULT NULL COMMENT '用户年龄',
   `phone` char(11) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NULL DEFAULT NULL COMMENT '联系电话',
   `address` varchar(64) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NULL DEFAULT NULL COMMENT '联系地址',
-  `status` int NOT NULL COMMENT '信息状态',
+  `status` int NOT NULL COMMENT '信息状态（0无效，1有效）',
   `create_time` char(19) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL COMMENT '添加时间',
   `type` int NOT NULL COMMENT '用户身份',
   PRIMARY KEY (`id`) USING BTREE
