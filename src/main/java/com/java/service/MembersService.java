@@ -7,7 +7,6 @@ import com.java.dto.MemberAddDto;
 import com.java.entity.*;
 import com.java.utils.IDUtils;
 import com.java.vo.PageData;
-import com.java.vo.R;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,15 +32,21 @@ public class MembersService {
     @Resource
     private ApplyLogsDao applyLogsDao;
 
-    @Resource
-    private ApplyDao applyDao;
 
-
+    @Transactional(rollbackFor = Exception.class)
     public void add(MemberAddDto memberAddDto) {
+        //加入社团表
         Members members = new Members();
         BeanUtils.copyProperties(memberAddDto, members);
         members.setId(IDUtils.makeIDByCurrent());
         membersDao.insert(members);
+        //修改申请表
+        LambdaQueryWrapper<ApplyLogs> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(ApplyLogs::getUserId, memberAddDto.getUserId())
+                .eq(ApplyLogs::getTeamId, memberAddDto.getTeamId());
+        ApplyLogs applyLogs = applyLogsDao.selectOne(queryWrapper);
+        applyLogs.setStatus(1);
+        applyLogsDao.updateById(applyLogs);
     }
 
 
@@ -103,29 +108,4 @@ public class MembersService {
         return new PageData(p.getCurrent(), p.getSize(), p.getTotal(), p.getRecords());
     }
 
-    public R apply(MemberAddDto memberAddDto) {
-        Teams team = teamsDao.selectById(memberAddDto.getTeamId());
-        if (team == null) {
-            return R.error("团队不存在");
-        }
-        if (team.getManager().equals(memberAddDto.getUserId())){
-            return R.error("社长不能申请加入自己的团队");
-        }
-        Integer i = membersDao.selectCount(new LambdaQueryWrapper<Members>().eq(Members::getUserId, memberAddDto.getUserId())
-                .eq(Members::getTeamId, memberAddDto.getTeamId()));
-        if (i > 0) {
-            return R.error("您已经是团队成员了");
-        }
-        Integer i1 = applyDao.selectCount(new LambdaQueryWrapper<Apply>().eq(Apply::getUserId, memberAddDto.getUserId())
-                .eq(Apply::getTeamId, memberAddDto.getTeamId()));
-        if (i1 > 0) {
-            return R.error("您已经申请过了");
-        }
-        Apply apply = new Apply();
-        BeanUtils.copyProperties(memberAddDto, apply);
-        apply.setSuccess("0");
-        apply.setId(IDUtils.makeIDByCurrent());
-        applyDao.insert(apply);
-        return R.success();
-    }
 }

@@ -11,7 +11,7 @@
  Target Server Version : 80100 (8.1.0)
  File Encoding         : 65001
 
- Date: 09/03/2024 10:52:33
+ Date: 16/03/2024 12:34:35
 */
 
 SET NAMES utf8mb4;
@@ -63,29 +63,12 @@ CREATE TABLE `activities`  (
 INSERT INTO `activities` VALUES ('1679549264062', '测试活动', '11', '11', '11', 1, '2023-03-24 00:00:00', '1642422100000', NULL);
 
 -- ----------------------------
--- Table structure for apply
--- ----------------------------
-DROP TABLE IF EXISTS `apply`;
-CREATE TABLE `apply`  (
-  `id` char(13) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '主键id',
-  `team_id` char(13) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '社团id',
-  `user_id` char(13) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '用户id',
-  `success` tinyint(1) NULL DEFAULT NULL COMMENT '是否成功(0：未成功，1：成功，2：拒绝)',
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
-
--- ----------------------------
--- Records of apply
--- ----------------------------
-INSERT INTO `apply` VALUES ('1709951439038', '1642422100000', '1642422100000', 1);
-
--- ----------------------------
 -- Table structure for apply_logs
 -- ----------------------------
 DROP TABLE IF EXISTS `apply_logs`;
 CREATE TABLE `apply_logs`  (
   `id` char(13) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL COMMENT '记录ID',
-  `status` int NOT NULL COMMENT '处理状态',
+  `status` int NOT NULL COMMENT '处理状态(0未处理，1已处理)',
   `create_time` char(19) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL COMMENT '申请时间',
   `team_id` char(13) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL COMMENT '申请社团',
   `user_id` char(13) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL COMMENT '申请用户',
@@ -99,7 +82,7 @@ CREATE TABLE `apply_logs`  (
 -- ----------------------------
 -- Records of apply_logs
 -- ----------------------------
-INSERT INTO `apply_logs` VALUES ('1672148640042', 1, '2022-12-27 21:44:00', '1642422100000', '1672148602348');
+INSERT INTO `apply_logs` VALUES ('1672148640042', 0, '2022-12-27 21:44:00', '1642422100000', '1672148602348');
 INSERT INTO `apply_logs` VALUES ('1679549203332', 1, '2023-03-23 13:26:43', '1672148926602', '1679549174356');
 
 -- ----------------------------

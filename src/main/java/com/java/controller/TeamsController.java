@@ -3,8 +3,6 @@ package com.java.controller;
 import com.java.config.CacheHandle;
 import com.java.dto.IdDto;
 import com.java.dto.TeamsPageDto;
-import com.java.dto.TokenPageDto;
-import com.java.entity.Apply;
 import com.java.entity.Teams;
 import com.java.entity.Users;
 import com.java.service.TeamsService;
@@ -118,21 +116,5 @@ public class TeamsController {
         return R.success();
     }
 
-    @PostMapping("/search")
-    @ResponseBody
-    @ApiOperation("社长查看申请记录列表（分页）")
-    public R delInfo(@RequestBody TokenPageDto tokenPageDto) {
-        String userId = cacheHandle.getUserInfoCache(tokenPageDto.getToken());
-        PageData page = teamsService.getApplyPage(userId,tokenPageDto.getPageSize(), tokenPageDto.getPageIndex());
-        return R.successData(page);
-    }
-
-    @PostMapping("/deal")
-    @ResponseBody
-    @ApiOperation("社长处理申请记录")
-    public R deal(@RequestBody Apply apply) {
-        teamsService.deal(apply);
-        return R.success();
-    }
 
 }
